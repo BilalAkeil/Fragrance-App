@@ -9,7 +9,7 @@
     "dev:web": "npm run dev --workspace @fragrance/web",
     "dev:mobile": "npm run start --workspace @fragrance/mobile",
     "build:web": "npm run build --workspace @fragrance/web",
-    "test": "npm run test --workspace @fragrance/core",
+    "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   }
 }

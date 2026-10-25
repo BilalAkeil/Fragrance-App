@@ -87,5 +87,11 @@ select seller_id, count(*) as review_count, avg(rating)::numeric(3, 2) as averag
 from reviews
 group by seller_id;
 
-create index listings_search on listings
-  using gin (to_tsvector('english', house || ' ' || name || ' ' || array_to_string(notes, ' ')));
+-- array_to_string is not marked immutable, so wrap it for use in an index.
+create function listing_search_text(house text, name text, notes text[]) returns text
+  language sql immutable as $$ select house || ' ' || name || ' ' || array_to_string(notes, ' ') $$;
+
+alter table listings add column search tsvector
+  generated always as (to_tsvector('english', listing_search_text(house, name, notes))) stored;
+
+create index listings_search on listings using gin (search);
