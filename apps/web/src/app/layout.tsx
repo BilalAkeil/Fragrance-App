@@ -20,7 +20,14 @@ export default function RootLayout({
             <Link href="/" className="text-lg font-semibold">
               Fragrance Marketplace
             </Link>
-            <span className="text-sm opacity-70">Certified sellers only</span>
+            <nav className="flex gap-4 text-sm">
+              <Link href="/sell" className="hover:underline">
+                Sell
+              </Link>
+              <Link href="/account" className="hover:underline">
+                Account
+              </Link>
+            </nav>
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
