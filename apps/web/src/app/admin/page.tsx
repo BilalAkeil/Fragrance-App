@@ -96,24 +96,24 @@ export default async function ReviewQueuePage({
       </div>
 
       {queue.length === 0 ? (
-        <p className="rounded-2xl border border-black/10 p-6 opacity-70 dark:border-white/10">Nothing waiting. Nice.</p>
+        <p className="rounded-2xl border border-line p-6 opacity-70">Nothing waiting. Nice.</p>
       ) : (
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
-          <ul className="overflow-hidden rounded-2xl border border-black/10 lg:w-80 dark:border-white/10">
+          <ul className="overflow-hidden rounded-2xl border border-line lg:w-80">
             {queue.map((q) => (
               <li key={q.key}>
                 <Link
                   href={`/admin?item=${q.key}`}
                   aria-current={q.key === selected?.key ? "true" : undefined}
-                  className={`flex flex-col gap-1 border-b border-black/10 px-4 py-3 dark:border-white/10 ${
-                    q.key === selected?.key ? "bg-[#EFE9F7] shadow-[inset_3px_0_0_#4A2A7A] dark:bg-white/10" : ""
+                  className={`flex flex-col gap-1 border-b border-line px-4 py-3 ${
+                    q.key === selected?.key ? "bg-sky shadow-[inset_3px_0_0_var(--color-brand)]" : ""
                   }`}
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="font-extrabold">{q.seller}</span>
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                        q.kind === "bottle" ? "bg-[#F7EDE6] text-[#6A3A12]" : "bg-[#E8F0F7] text-[#1F4A73]"
+                        q.kind === "bottle" ? "bg-decant-tint text-decant-ink" : "bg-neutral-tint text-brand"
                       }`}
                     >
                       {q.kind === "bottle" ? "Bottle video" : "Receipt"}
@@ -128,7 +128,7 @@ export default async function ReviewQueuePage({
           </ul>
 
           {selected && (
-            <section className="flex min-w-0 flex-1 flex-col gap-4 rounded-2xl border border-black/10 p-5 dark:border-white/10">
+            <section className="flex min-w-0 flex-1 flex-col gap-4 rounded-2xl border border-line p-5">
               <h2 className="text-xl font-extrabold">
                 {selected.kind === "bottle" ? "Bottle video" : "Proof of purchase"} · {selected.seller}
               </h2>
@@ -186,13 +186,13 @@ export default async function ReviewQueuePage({
 
               <form
                 action={selected.kind === "bottle" ? reviewBottle : reviewReceipt}
-                className="flex flex-col gap-3 border-t border-black/10 pt-4 sm:flex-row sm:items-end dark:border-white/10"
+                className="flex flex-col gap-3 border-t border-line pt-4 sm:flex-row sm:items-end"
               >
                 <input type="hidden" name="id" value={selected.id} />
                 <input type="hidden" name="item" value={selected.key} />
                 <label className="flex flex-1 flex-col gap-1 text-sm font-bold">
                   If rejecting, tell the seller why
-                  <select name="reason" className="h-11 rounded-lg border border-black/15 bg-transparent px-3 font-normal dark:border-white/20">
+                  <select name="reason" className="h-11 rounded-lg border border-field bg-transparent px-3 font-normal">
                     <option value="">Choose a reason</option>
                     {(selected.kind === "bottle" ? BOTTLE_REASONS : RECEIPT_REASONS).map((r) => (
                       <option key={r}>{r}</option>
@@ -206,12 +206,12 @@ export default async function ReviewQueuePage({
                 >
                   Reject
                 </button>
-                <button name="decision" value="approve" className="h-11 rounded-full bg-[#0B6B5E] px-5 font-bold text-white">
+                <button name="decision" value="approve" className="h-11 rounded-full bg-verified px-5 font-bold text-white">
                   Approve
                 </button>
               </form>
-              {error === "reason" && <p className="text-sm text-red-700 dark:text-red-300">Choose a reason before rejecting.</p>}
-              {error === "save" && <p className="text-sm text-red-700 dark:text-red-300">That didn&apos;t save. Please try again.</p>}
+              {error === "reason" && <p className="text-sm text-red-700">Choose a reason before rejecting.</p>}
+              {error === "save" && <p className="text-sm text-red-700">That didn&apos;t save. Please try again.</p>}
             </section>
           )}
         </div>
@@ -226,7 +226,7 @@ function Checks({ items }: { items: string[] }) {
       <legend className="mb-1 text-sm font-extrabold">Checks</legend>
       {items.map((c) => (
         <label key={c} className="flex items-center gap-2 text-sm">
-          <input type="checkbox" className="h-4 w-4 accent-[#0B6B5E]" /> {c}
+          <input type="checkbox" className="h-4 w-4 accent-verified" /> {c}
         </label>
       ))}
     </fieldset>
