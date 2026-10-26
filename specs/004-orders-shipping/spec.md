@@ -85,8 +85,12 @@ Once an order is paid, both sides need to know what happens next. The seller get
 
 ## Open questions
 
-- [ ] **Q-1:** Which shipping broker? This is brief Q-6a: Sendcloud or Packlink. Each needs checking for live UK quotes, labels, locker services and tracking webhooks.
-- [ ] **Q-2:** Which services and bottle sizes can carry perfume (Royal Mail, Evri, InPost and so on)? This is brief Q-7, and it depends on the broker.
+- [ ] **Q-1:** Which shipping broker? This is brief Q-6a. **Proposed:** not Packlink, which prohibits perfume. Use Sendcloud if it confirms it can carry perfume on Royal Mail, otherwise Royal Mail direct. See [the research](../../docs/research/2026-10-26-holds-and-shipping.md).
+- [ ] **Q-2:** Which services and bottle sizes can carry perfume? This is brief Q-7. **Found:**
+  - Evri, InPost (lockers included) and DHL prohibit perfume.
+  - Royal Mail Tracked 24/48 allows it within the UK: ≤150ml per item, ≤8 per parcel, in retail packaging, with an ID8000 label.
+  - If that holds, the buyer's choice is Tracked 24 or 48, and "collected from a locker" no longer applies.
+  - Still to settle: bottles over 150ml, and whether decants count as retail packaging (ask Royal Mail).
 - [ ] **Q-3:** Do bank holidays pause the ship-by countdown?
 - [ ] **Q-4:** How do we work out parcel size and weight for a quote? Either from the bottle size and kind, or by asking the seller to pick small or medium.
 - [ ] **Q-5:** What happens if tracking never shows delivered (a lost parcel)? Suggestion: after a set number of days, the buyer can report "not received" (008), and we claim from the carrier.

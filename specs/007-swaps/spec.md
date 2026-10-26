@@ -131,7 +131,7 @@ Fragrance fans often have bottles they're bored of and bottles they want. Swappi
 - [ ] **Q-1:** "Swap" or "Trade" for users? This is brief Q-12.
 - [x] **Q-2:** When someone doesn't ship or sends a fake, what does it cost them? **The full guide value of what they promised, paid to the other person, who also gets their fee and cash back** (Bilal, 2026-10-26, PR #8). How it's collected depends on Q-4. The Trade design's copy needs updating to match.
 - [ ] **Q-3:** What's the Swap Protection fee? This is brief Q-2; Buyer Protection is settled at 3% + 30p. Does Buyer Protection also apply to the cash part?
-- [ ] **Q-4:** A card hold normally lasts 7 days, and a swap can run longer. Do we take a deposit and refund it, use extended holds, or re-hold near expiry? This is brief Q-4. It changes the words users see: "hold" or "deposit".
+- [ ] **Q-4:** A card hold normally lasts 7 days, and a swap runs 10 to 14. This is brief Q-4. **Proposed:** take each side's swap value as a deposit, refunded in full on completion. It works on every card and makes Bilal's failed-swap compensation certain. It costs about 1.5% + 20p of the deposit, so the Swap Protection fee (Q-3) should cover that. Users would see "Deposit: £60.00, refunded when the swap completes". See [the research](../../docs/research/2026-10-26-holds-and-shipping.md).
 - [ ] **Q-5:** Does each side pay their own postage (as R-9 assumes)?
 - [ ] **Q-6:** How long does the second person have to pay after acceptance (24 hours is assumed)?
 - [ ] **Q-7:** Can people list something only for swapping, with no sale price?

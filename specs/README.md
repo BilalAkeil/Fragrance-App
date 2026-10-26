@@ -100,9 +100,16 @@ Already settled by Bilal in PR #8: Buyer Protection is 3% + 30p (003 Q-1). A fai
 
 ### Research before the plan (Claude can do these)
 
-- **Card holds for swaps that run past 7 days** (brief Q-4, 007 Q-4): deposit and refund, extended holds, or re-holding.
-- **Shipping broker** (brief Q-6a, 004 Q-1): Sendcloud or Packlink. Compare live UK quotes, labels, lockers and tracking webhooks.
-- **Perfume postage rules by carrier and size** (brief Q-7, 004 Q-2).
+The first three are written up in [docs/research/2026-10-26-holds-and-shipping.md](../docs/research/2026-10-26-holds-and-shipping.md), with recommendations to settle with Bilal:
+
+- **Card holds for swaps that run past 7 days** (brief Q-4, 007 Q-4). **Proposed:** a deposit refunded on completion, with the Swap Protection fee covering its card fee.
+- **Shipping broker** (brief Q-6a, 004 Q-1). **Proposed:** rule out Packlink, which prohibits perfume. Use Sendcloud, subject to its answers, otherwise Royal Mail direct.
+- **Perfume postage rules by carrier and size** (brief Q-7, 004 Q-2). **Found:**
+  - Evri, InPost and DHL ban perfume.
+  - Royal Mail Tracked allows it: ≤150ml per item, in retail packaging, with an ID8000 label.
+  - So the delivery decision and the rules for decants need revisiting.
+
+Still to research:
 - **Parcel size and weight for quotes** (004 Q-4).
 - **Lost parcels and carrier claims** (004 Q-5, 008 Q-4).
 - **Email provider and sending domain** (010 Q-1).
