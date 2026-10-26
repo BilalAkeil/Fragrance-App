@@ -22,6 +22,7 @@ Bilal's decisions, so specs can be checked against them. Where the brief adds de
 | Light blue theme | 2026-10-26 |
 | Buyer Protection fee is 3% + 30p | 2026-10-26 |
 | A failed swap costs the side at fault the full resale value of their item, paid to the other person | 2026-10-26 |
+| A proven fake gets the seller a warning. More than 3 proven fakes and they're banned | 2026-10-26 |
 
 ## What it is
 
@@ -96,6 +97,7 @@ If someone doesn't ship by the deadline, or sends a fake (decided in a dispute),
 - **Source bottles for decants are optional.** A seller can register a source bottle with a video (the whole bottle, the batch code close up, and a paper note with their username and the date, in one take). A decant linked to a bottle whose video we've checked gets a "Verified source" badge. Decants are at least 5ml, and decants from a linked bottle can never add up to more than its size.
 - **Decants are labelled** with the house, fragrance, size, the batch code where there is one, and the date decanted. Listing photos show the label.
 - **Buyer Protection and Swap Protection:** disputes for fakes, items not as described, and items that never arrived.
+- **Strikes for fakes:** each fake proven in a dispute gives the seller a warning. On the 4th, the account is banned (Bilal, 2026-10-26). The buyer is refunded every time.
 - **Messaging stays in the app**, so we have a record for disputes and can spot people trying to move off-platform.
 
 ## Feature map
@@ -159,4 +161,5 @@ These need answers before the specs that depend on them are agreed.
 - [x] **Q-9 Who can sell or swap:** ID is verified before anyone can list or swap. Buying needs no ID check.
 - [ ] **Q-10 Mobile timing:** Bilal wants a website and an app, and the product plan has them launching together. This brief puts the app after the web MVP. Is launching web first OK?
 - [x] **Q-11 What a failed swap costs:** the side at fault is charged the full resale value of the item they promised, which goes to the other person as compensation. The other person's cash top-up and fee are refunded too (Bilal, 2026-10-26). The Trade design's copy needs updating to match. How we collect it depends on Q-4.
+- [x] **Q-13 Proven fakes:** a warning each time, and a ban after more than 3 (so on the 4th). Bilal, 2026-10-26.
 - [ ] **Q-12 Swap or Trade:** this brief says "swap", the design and website say "Trade". Pick one word for users.
