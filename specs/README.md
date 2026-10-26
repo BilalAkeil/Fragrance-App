@@ -104,10 +104,9 @@ The first three are written up in [docs/research/2026-10-26-holds-and-shipping.m
 
 - **Card holds for swaps that run past 7 days** (brief Q-4, 007 Q-4). **Proposed:** a deposit refunded on completion, with the Swap Protection fee covering its card fee.
 - **Shipping broker** (brief Q-6a, 004 Q-1). **Proposed:** rule out Packlink, which prohibits perfume. Use Sendcloud, subject to its answers, otherwise Royal Mail direct.
-- **Perfume postage rules by carrier and size** (brief Q-7, 004 Q-2). **Found:**
-  - Evri, InPost and DHL ban perfume.
-  - Royal Mail Tracked allows it: ≤150ml per item, in retail packaging, with an ID8000 label.
-  - So the delivery decision and the rules for decants need revisiting.
+- **Perfume postage rules by carrier and size** (brief Q-7, 004 Q-2). **Decided:** Royal Mail Tracked 24 and 48 only (Ben and Bilal, 2026-10-26), since Evri, InPost and DHL ban perfume. Still open:
+  - bottles over 150ml (004 Q-6)
+  - whether decants count as retail packaging (004 Q-7, ask Royal Mail)
 
 Still to research:
 - **Parcel size and weight for quotes** (004 Q-4).

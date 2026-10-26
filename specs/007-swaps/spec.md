@@ -70,7 +70,7 @@ Fragrance fans often have bottles they're bored of and bottles they want. Swappi
 
 ### US-6: As a swapper, I want to confirm what I received or report a problem
 
-- **AC-6.1:** When my incoming parcel is delivered or collected, then I have 48 hours to choose "Everything's OK" or "Report a problem" (008). If I do neither, my side confirms itself after 48 hours.
+- **AC-6.1:** When my incoming parcel is delivered, then I have 48 hours to choose "Everything's OK" or "Report a problem" (008). If I do neither, my side confirms itself after 48 hours.
 - **AC-6.2:** Given both sides are confirmed, then the swap completes:
   - both holds are released
   - any cash top-up is paid to the person receiving it
