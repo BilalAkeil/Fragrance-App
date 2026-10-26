@@ -13,9 +13,9 @@ Bilal's decisions, so specs can be checked against them. Where the brief adds de
 | UK only, prices in GBP | 2026-10-25 |
 | A website and a mobile app | 2026-10-25 |
 | "Certified" means a verified seller: ID checked, proof of purchase where possible, and an average of at least 4★ | 2026-10-25 |
-| Decants allowed: at least 5ml, labelled, and the source bottle proven by video | 2026-10-25 |
+| Decants allowed: at least 5ml and labelled. Linking a source bottle with a video is optional, and earns a "Verified source" badge once checked | 2026-10-25, changed 2026-10-26 |
 | Free for sellers. Buyers pay a Vinted-style Buyer Protection fee at checkout | 2026-10-25 |
-| The seller chooses the carrier (Evri, InPost, Royal Mail or others). Postage is quoted live once the buyer enters their address | 2026-10-25, 2026-10-26 |
+| The buyer picks the delivery service at checkout. Postage is quoted live once they enter their address | 2026-10-26 |
 | Users can swap (trade) fragrances | 2026-10-26 |
 | An offer stays open until it is accepted or the item is bought, then the item is marked sold | 2026-10-26 |
 | Money is held until both sides confirm, or 48 hours after delivery or collection | 2026-10-26 |
@@ -46,7 +46,7 @@ A UK marketplace where fragrance fans **buy, sell and swap** full bottles, parti
 **Buy**
 1. Browse or search.
 2. Open a listing.
-3. Enter an address, pick one of the seller's delivery services at its live price, and pay: item + postage + Buyer Protection. The item is marked sold and any open swap proposals for it close.
+3. Enter an address, pick a delivery service at its live price, and pay: item + postage + Buyer Protection. The item is marked sold and any open swap proposals for it close.
 4. Seller gets a prepaid label and ships within 5 working days, or the order is cancelled and refunded.
 5. Delivered, or collected from a locker or pickup point.
 6. Buyer confirms, or it auto-completes after 48 hours.
@@ -78,8 +78,7 @@ If someone doesn't ship by the deadline, or sends a fake (decided in a dispute),
 
 ## Shipping (Vinted-style)
 
-- **The seller chooses the carriers.** Each seller picks which delivery services they'll use (for example Evri, InPost lockers, Royal Mail Tracked 48).
-- **Live postage quotes:** once the buyer enters their address, each of the seller's services is priced live for that postcode and parcel through a shipping broker that covers several carriers (Sendcloud or Packlink, see Q-6a). The buyer picks one of those and pays for postage.
+- **The buyer picks the delivery service.** Once the buyer enters their address, the delivery services we support (for example Evri, InPost lockers, Royal Mail Tracked 48) are priced live for that postcode and parcel through a shipping broker that covers several carriers (Sendcloud or Packlink, see Q-6a). The buyer picks one and pays for postage.
 - **Prepaid labels:** the seller gets a label or QR code for that service to drop off.
 - **Tracking is automatic.** Tracking comes from the carrier, so nobody types tracking numbers, and "delivered" or "collected" comes from the carrier too. This is what starts the 48-hour completion window.
 - **Ship-by:** 5 working days, then the order is cancelled automatically and the buyer refunded. The same applies to each side of a swap.
@@ -92,8 +91,8 @@ If someone doesn't ship by the deadline, or sends a fake (decided in a dispute),
 - **Proof of purchase, where possible:** sellers can add a receipt or order confirmation to a listing or a source bottle. An admin reviews it, and an approved one shows a "Receipt verified" tag. It's encouraged, not required, so it never blocks the badge on its own.
 - **Photos are required** on every listing.
 - **Batch codes are optional on full bottles and partials.** Not every bottle has one. A listing without one shows "No batch code".
-- **Decants need a checked source bottle.** Every decant links to a source bottle the seller registered with a video (the whole bottle, the batch code close up, and a paper note with their username and the date, in one take), and it can't go live until we've checked that video. Decants are at least 5ml, and decants from one bottle can never add up to more than its size. Already in `packages/core/src/decants.ts`.
-- **Decants are labelled** with the house, fragrance, size, the source bottle's batch code and the date decanted. Listing photos show the label.
+- **Source bottles for decants are optional.** A seller can register a source bottle with a video (the whole bottle, the batch code close up, and a paper note with their username and the date, in one take). A decant linked to a bottle whose video we've checked gets a "Verified source" badge. Decants are at least 5ml, and decants from a linked bottle can never add up to more than its size.
+- **Decants are labelled** with the house, fragrance, size, the batch code where there is one, and the date decanted. Listing photos show the label.
 - **Buyer Protection and Swap Protection:** disputes for fakes, items not as described, and items that never arrived.
 - **Messaging stays in the app**, so we have a record for disputes and can spot people trying to move off-platform.
 
@@ -103,10 +102,10 @@ Each feature becomes `specs/NNN-name/`. The MVP is everything needed to launch w
 
 | # | Feature | Today | Priority |
 | --- | --- | --- | --- |
-| 001 | **Baseline**: sign-in, profiles, listings, photos, browse/search. Make batch codes optional on full bottles and partials (decants keep their source bottle rules) | Built (document + relax rules) | MVP |
+| 001 | **Baseline**: sign-in, profiles, listings, photos, browse/search. Make batch codes and decant source bottles optional | Built (document + relax rules) | MVP |
 | 002 | **Fragrance catalogue**: one canonical list of houses, fragrances and sizes, with guide prices for swap holds | New | MVP |
 | 003 | **Checkout and payments**: Stripe Checkout, Buyer Protection fee, held funds, Connect payouts | Fees only | MVP |
-| 004 | **Orders and shipping**: seller's carrier choice, live quotes through a shipping broker, prepaid labels, automatic tracking, 5-day ship-by, "Everything's OK", 48-hour auto-complete | Schema only | MVP |
+| 004 | **Orders and shipping**: buyer's choice of delivery service, live quotes through a shipping broker, prepaid labels, automatic tracking, 5-day ship-by, "Everything's OK", 48-hour auto-complete | Schema only | MVP |
 | 005 | **Verification and reviews**: Stripe Identity before listing, reviews after completion, certification badge | Partial | MVP |
 | 006 | **Messaging**: one thread per listing, swap or order, with photos | New | MVP |
 | 007 | **Swaps**: open-to-swap items, proposals and counters, cash top-up, protection fee + card hold, dual shipping | New | MVP |
@@ -123,8 +122,8 @@ This is the list for Claude Design, grouped by flow. ✅ means a basic version a
 
 1. **Browse:** home ✅; search results with filters (type, size, condition, house, price, certified only, open to swaps)
 2. **Listing:** listing detail ✅, showing photos, seller badge, price breakdown with Buyer Protection, batch code / receipt verified / verified-source badge, Buy and Propose swap buttons
-3. **Sell:** create/edit listing ✅ (full / partial / decant, source bottle required for decants, optional receipt, open-to-swaps toggle); my source bottles ✅; my delivery services
-4. **Checkout:** address, then the seller's delivery services with live prices; order confirmation
+3. **Sell:** create/edit listing ✅ (full / partial / decant, optional source bottle, optional receipt, open-to-swaps toggle); my source bottles ✅
+4. **Checkout:** address, then delivery services with live prices; order confirmation
 5. **Orders:** my orders (buying / selling); order detail with a tracking timeline, ship-by countdown, label download, "Everything's OK" and "Report a problem"
 6. **Swaps:** propose swap (pick my items, add cash); swap detail (terms, protection, both tracking timelines, confirm); my swaps
 7. **Messages:** inbox; thread (linked to a listing, swap or order)
@@ -150,7 +149,7 @@ These need answers before the specs that depend on them are agreed.
 - [x] **Q-5 Hold value:** the catalogue guide price.
   - [ ] **Q-5a:** where do the guide prices come from, and how often are they updated? Options: we set them by hand, or derive them from recent sales on the platform with a manual starting value.
 - [x] **Q-6 Shipping labels:** prepaid labels, Vinted-style.
-  - [ ] **Q-6a:** which shipping broker? The seller picks their carriers and postage is quoted live (Bilal), so we need a broker that covers several UK carriers and returns live prices, labels and tracking. Sendcloud or Packlink.
+  - [ ] **Q-6a:** which shipping broker? The buyer picks the service and postage is quoted live (Bilal), so we need a broker that covers several UK carriers and returns live prices, labels and tracking. Sendcloud or Packlink.
 - [ ] **Q-7 Postage rules:** Royal Mail treats perfume as a flammable liquid with volume limits, and other carriers have their own rules. Which services and bottle sizes do we allow? This depends on Q-6a.
 - [ ] **Q-8 Certification:** how many reviews before the 4★ rule applies? (5 is a placeholder.) Do swaps count towards reviews?
 - [x] **Q-9 Who can sell or swap:** ID is verified before anyone can list or swap. Buying needs no ID check.
