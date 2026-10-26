@@ -20,6 +20,10 @@ Bilal's decisions, so specs can be checked against them. Where the brief adds de
 | An offer stays open until it is accepted or the item is bought, then the item is marked sold | 2026-10-26 |
 | Money is held until both sides confirm, or 48 hours after delivery or collection | 2026-10-26 |
 | Light blue theme | 2026-10-26 |
+| Buyer Protection fee is 3% + 30p | 2026-10-26 |
+| A failed swap costs the side at fault the full resale value of their item, paid to the other person | 2026-10-26 |
+| A proven fake gets the seller a warning. More than 3 proven fakes and they're banned | 2026-10-26 |
+| Refunds work like Vinted: no change-of-mind returns, refunds only for lost, damaged, not-as-described or fake items | 2026-10-26 |
 
 ## What it is
 
@@ -37,9 +41,21 @@ A UK marketplace where fragrance fans **buy, sell and swap** full bottles, parti
 ## How money works (Vinted-style)
 
 - **Sellers pay nothing.**
-- **Buyers pay a Buyer Protection fee** on top of the item price and postage. This is already in `packages/core/src/fees.ts` (placeholder 4% + 50p).
+- **Buyers pay a Buyer Protection fee** on top of the item price and postage. This is already in `packages/core/src/fees.ts`: 3% of the item price + 30p (Bilal, 2026-10-26).
 - **Payment is held** until the order completes. An order completes when the buyer taps "Everything's OK", or automatically **48 hours after tracking shows it delivered, or collected from a locker or pickup point,** if they haven't reported a problem. Reporting a problem in that window pauses completion and opens a dispute.
 - **The seller is paid** into their Stripe Connect account when the order completes.
+
+## Refunds and returns (Vinted-style, Bilal 2026-10-26)
+
+- **No change-of-mind returns.** Sellers are mostly private people, so a buyer can't return an item just because they don't like it, unless the seller agrees.
+- **Refunds only through Buyer Protection**, when an item:
+  - never arrives (lost in the post): full refund;
+  - arrives damaged, or significantly not as described: the buyer posts it back, and is refunded once the seller receives it;
+  - is fake: full refund, and the seller gets a strike (see Trust model).
+- **48-hour window.** The buyer reports the problem within 48 hours of delivery or collection. Tapping "Everything's OK", or letting the 48 hours pass, completes the order and ends protection.
+- **Return postage** is paid by the buyer, as on Vinted. Who pays for returning a fake is still open (Q-14).
+- **A full refund covers** the item, the postage and the Buyer Protection fee.
+- **Disputes:** if the buyer and seller can't agree, an admin looks at the evidence (photos, messages, tracking) and decides.
 
 ## Core loops
 
@@ -64,7 +80,7 @@ A UK marketplace where fragrance fans **buy, sell and swap** full bottles, parti
 8. Holds are released, and any cash top-up is paid out.
 9. Both review each other.
 
-If someone doesn't ship by the deadline, or sends a fake (decided in a dispute), their hold is charged to compensate the other person.
+If someone doesn't ship by the deadline, or sends a fake (decided in a dispute), their hold is charged for the full value of the item they promised (its resale value, the catalogue guide price) and paid to the other person as compensation. The other person also gets back any cash top-up and their Swap Protection fee (Bilal, 2026-10-26).
 
 ## Swap rules (decided)
 
@@ -94,6 +110,7 @@ If someone doesn't ship by the deadline, or sends a fake (decided in a dispute),
 - **Source bottles for decants are optional.** A seller can register a source bottle with a video (the whole bottle, the batch code close up, and a paper note with their username and the date, in one take). A decant linked to a bottle whose video we've checked gets a "Verified source" badge. Decants are at least 5ml, and decants from a linked bottle can never add up to more than its size.
 - **Decants are labelled** with the house, fragrance, size, the batch code where there is one, and the date decanted. Listing photos show the label.
 - **Buyer Protection and Swap Protection:** disputes for fakes, items not as described, and items that never arrived.
+- **Strikes for fakes:** each fake proven in a dispute gives the seller a warning. On the 4th, the account is banned (Bilal, 2026-10-26). The buyer is refunded every time.
 - **Messaging stays in the app**, so we have a record for disputes and can spot people trying to move off-platform.
 
 ## Feature map
@@ -143,7 +160,9 @@ These need answers before the specs that depend on them are agreed.
 - [ ] **Q-1 Name and brand:** what's the working name? Any logo or colours to start the design system from?
   - [x] **Colours:** light blue (Bilal, 2026-10-26), already on the website.
   - [ ] **Name and logo:** Bilal is choosing from a shortlist.
-- [ ] **Q-2 Fee levels:** what are the final Buyer Protection and Swap Protection fees? (Buyer Protection is a 4% + 50p placeholder today.)
+- [ ] **Q-2 Fee levels:** what are the final Buyer Protection and Swap Protection fees?
+  - [x] **Buyer Protection:** 3% + 30p (Bilal, 2026-10-26), the lowest level that still covers card costs with a small buffer for refunds.
+  - [ ] **Swap Protection:** not set yet.
 - [x] **Q-3 Swap deadline:** 5 working days, as Vinted does. Bilal to confirm: the design still shows "[N] working days".
 - [ ] **Q-4 Card hold limits:** a standard Stripe card hold expires after 7 days. A swap is 5 working days to ship, plus delivery, plus the 2-day check, so it will usually run past that. Options: take the payment up front and refund it on completion; use Stripe's extended authorisations where the card is eligible; or re-authorise near expiry. To settle in 007's plan, but it changes the wording users see ("hold" vs "deposit, refunded").
 - [x] **Q-5 Hold value:** the catalogue guide price.
@@ -154,5 +173,7 @@ These need answers before the specs that depend on them are agreed.
 - [ ] **Q-8 Certification:** how many reviews before the 4★ rule applies? (5 is a placeholder.) Do swaps count towards reviews?
 - [x] **Q-9 Who can sell or swap:** ID is verified before anyone can list or swap. Buying needs no ID check.
 - [ ] **Q-10 Mobile timing:** Bilal wants a website and an app, and the product plan has them launching together. This brief puts the app after the web MVP. Is launching web first OK?
-- [ ] **Q-11 What a failed swap costs:** this brief charges the late or dishonest side's card hold to compensate the other person. The design instead says the other person gets their cash and fee refunded. Which do we tell users?
+- [x] **Q-11 What a failed swap costs:** the side at fault is charged the full resale value of the item they promised, which goes to the other person as compensation. The other person's cash top-up and fee are refunded too (Bilal, 2026-10-26). The Trade design's copy needs updating to match. How we collect it depends on Q-4.
+- [x] **Q-13 Proven fakes:** a warning each time, and a ban after more than 3 (so on the 4th). Bilal, 2026-10-26.
+- [ ] **Q-14 Returning a fake:** does the buyer post a fake back at the seller's cost, at ours, or not at all (for example, keep it as evidence or destroy it)?
 - [ ] **Q-12 Swap or Trade:** this brief says "swap", the design and website say "Trade". Pick one word for users.

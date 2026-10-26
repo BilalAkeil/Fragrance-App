@@ -17,7 +17,7 @@ We build spec first: see `CLAUDE.md` for the workflow and the rules every change
 
 ## Rules in `packages/core`
 
-- **Fees:** sellers pay nothing. Buyers pay a Buyer Protection fee (placeholder 4% + 50p) that covers Stripe card fees (1.5% + 20p standard UK card) and refunds.
+- **Fees:** sellers pay nothing. Buyers pay a Buyer Protection fee (3% + 30p) that covers Stripe card fees (1.5% + 20p standard UK card) and refunds.
 - **Certification:** ID verified, plus an average of at least 4 stars once a seller has 5 reviews (the 5 is a placeholder).
 - **Decants:** at least 5ml, linked to a registered source bottle whose video has been checked, and capped at the bottle's size.
 
