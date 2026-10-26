@@ -23,6 +23,7 @@ Bilal's decisions, so specs can be checked against them. Where the brief adds de
 | Buyer Protection fee is 3% + 30p | 2026-10-26 |
 | A failed swap costs the side at fault the full resale value of their item, paid to the other person | 2026-10-26 |
 | A proven fake gets the seller a warning. More than 3 proven fakes and they're banned | 2026-10-26 |
+| Refunds work like Vinted: no change-of-mind returns, refunds only for lost, damaged, not-as-described or fake items | 2026-10-26 |
 
 ## What it is
 
@@ -43,6 +44,18 @@ A UK marketplace where fragrance fans **buy, sell and swap** full bottles, parti
 - **Buyers pay a Buyer Protection fee** on top of the item price and postage. This is already in `packages/core/src/fees.ts`: 3% of the item price + 30p (Bilal, 2026-10-26).
 - **Payment is held** until the order completes. An order completes when the buyer taps "Everything's OK", or automatically **48 hours after tracking shows it delivered, or collected from a locker or pickup point,** if they haven't reported a problem. Reporting a problem in that window pauses completion and opens a dispute.
 - **The seller is paid** into their Stripe Connect account when the order completes.
+
+## Refunds and returns (Vinted-style, Bilal 2026-10-26)
+
+- **No change-of-mind returns.** Sellers are mostly private people, so a buyer can't return an item just because they don't like it, unless the seller agrees.
+- **Refunds only through Buyer Protection**, when an item:
+  - never arrives (lost in the post): full refund;
+  - arrives damaged, or significantly not as described: the buyer posts it back, and is refunded once the seller receives it;
+  - is fake: full refund, and the seller gets a strike (see Trust model).
+- **48-hour window.** The buyer reports the problem within 48 hours of delivery or collection. Tapping "Everything's OK", or letting the 48 hours pass, completes the order and ends protection.
+- **Return postage** is paid by the buyer, as on Vinted. Who pays for returning a fake is still open (Q-14).
+- **A full refund covers** the item, the postage and the Buyer Protection fee.
+- **Disputes:** if the buyer and seller can't agree, an admin looks at the evidence (photos, messages, tracking) and decides.
 
 ## Core loops
 
@@ -162,4 +175,5 @@ These need answers before the specs that depend on them are agreed.
 - [ ] **Q-10 Mobile timing:** Bilal wants a website and an app, and the product plan has them launching together. This brief puts the app after the web MVP. Is launching web first OK?
 - [x] **Q-11 What a failed swap costs:** the side at fault is charged the full resale value of the item they promised, which goes to the other person as compensation. The other person's cash top-up and fee are refunded too (Bilal, 2026-10-26). The Trade design's copy needs updating to match. How we collect it depends on Q-4.
 - [x] **Q-13 Proven fakes:** a warning each time, and a ban after more than 3 (so on the 4th). Bilal, 2026-10-26.
+- [ ] **Q-14 Returning a fake:** does the buyer post a fake back at the seller's cost, at ours, or not at all (for example, keep it as evidence or destroy it)?
 - [ ] **Q-12 Swap or Trade:** this brief says "swap", the design and website say "Trade". Pick one word for users.
