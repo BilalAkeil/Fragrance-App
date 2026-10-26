@@ -25,12 +25,12 @@ export default async function AccountPage({
     ? await Promise.all([
         supabase
           .from("listings")
-          .select("id, house, name, kind, size_ml, price_pence, status")
+          .select("id, house, name, kind, size_ml, price_pence, status, receipt_rejected_reason")
           .eq("seller_id", user.id)
           .order("created_at", { ascending: false }),
         supabase
           .from("source_bottles")
-          .select("id, house, name, size_ml, verified_at")
+          .select("id, house, name, size_ml, verified_at, rejected_reason")
           .eq("seller_id", user.id),
       ])
     : [null, null];
@@ -94,8 +94,13 @@ export default async function AccountPage({
                     <Link href={`/listings/${l.id}`} className="hover:underline">
                       {l.house} {l.name}, {l.size_ml}ml {l.kind}
                     </Link>
-                    <span>
+                    <span className="text-right">
                       {formatGBP(l.price_pence)} · {l.status}
+                      {l.receipt_rejected_reason && (
+                        <span className="block text-xs text-red-700 dark:text-red-300">
+                          Receipt not approved: {l.receipt_rejected_reason}
+                        </span>
+                      )}
                     </span>
                   </li>
                 ))}
@@ -114,7 +119,13 @@ export default async function AccountPage({
                     <span>
                       {b.house} {b.name}, {b.size_ml}ml
                     </span>
-                    <span className="opacity-70">{b.verified_at ? "Video checked" : "Waiting for video check"}</span>
+                    <span className={b.rejected_reason ? "text-red-700 dark:text-red-300" : "opacity-70"}>
+                      {b.verified_at
+                        ? "Video checked"
+                        : b.rejected_reason
+                          ? `Not approved: ${b.rejected_reason}`
+                          : "Waiting for video check"}
+                    </span>
                   </li>
                 ))}
               </ul>
