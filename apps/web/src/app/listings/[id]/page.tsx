@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { checkoutBreakdown, formatGBP } from "@fragrance/core";
+import { batchCodeLabel, checkoutBreakdown, formatGBP, hasVerifiedSource } from "@fragrance/core";
 import { BottleTile } from "@/components/BottleTile";
 import { KIND_LABELS } from "@/components/labels";
 import { SellerBadge } from "@/components/SellerBadge";
@@ -64,9 +64,12 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                 {KIND_LABELS[listing.kind]} · {listing.sizeMl}ml
                 {listing.fillPercent !== undefined ? ` · ${listing.fillPercent}% full` : ""}
               </span>
-              <span className="rounded-full bg-neutral-tint px-3 py-1 text-neutral-ink">Batch {listing.batchCode}</span>
+              <span className="rounded-full bg-neutral-tint px-3 py-1 text-neutral-ink">{batchCodeLabel(listing.batchCode)}</span>
               {listing.receiptVerified && (
                 <span className="rounded-full bg-verified-tint px-3 py-1 text-verified-ink">Receipt verified</span>
+              )}
+              {hasVerifiedSource(listing, bottle) && (
+                <span className="rounded-full bg-verified-tint px-3 py-1 text-verified-ink">Verified source</span>
               )}
             </div>
           </div>
@@ -109,7 +112,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
       </div>
 
       <div className="flex flex-wrap gap-12">
-        {bottle && (
+        {hasVerifiedSource(listing, bottle) && bottle && (
           <section className="flex min-w-0 flex-[1_1_440px] flex-col gap-4">
             <h2 className="text-xl font-extrabold">Where this decant came from</h2>
             <div className="flex flex-col gap-1.5 rounded-2xl bg-panel p-5">
@@ -117,7 +120,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                 Source bottle: {bottle.house} {bottle.name} {bottle.sizeMl}ml
               </p>
               <p className="text-sm leading-normal text-muted">
-                Filmed by the seller with batch code {bottle.batchCode}. Video checked by our team.
+                Filmed by the seller{bottle.batchCode ? ` with batch code ${bottle.batchCode}` : ""}. Video checked by our team.
               </p>
             </div>
           </section>
@@ -134,7 +137,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             <dt className="text-muted">Condition</dt>
             <dd>{CONDITION_LABELS[listing.condition]}</dd>
             <dt className="text-muted">Batch code</dt>
-            <dd>{listing.batchCode}</dd>
+            <dd>{listing.batchCode ?? "None"}</dd>
           </dl>
         </section>
       </div>

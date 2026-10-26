@@ -20,7 +20,7 @@ export interface SourceBottleRow {
   house: string;
   name: string;
   size_ml: number;
-  batch_code: string;
+  batch_code: string | null;
   video_path: string;
   receipt_path: string | null;
   verified_at: string | null;
@@ -35,12 +35,13 @@ export interface ListingRow {
   size_ml: number;
   fill_percent: number | null;
   condition: Listing["condition"];
-  batch_code: string;
+  batch_code: string | null;
   price_pence: number;
   postage_pence: number;
   receipt_verified: boolean;
   source_bottle_id: string | null;
   notes: string[];
+  status: Listing["status"];
   listing_photos?: { path: string; position: number }[];
 }
 
@@ -61,7 +62,7 @@ export function toSourceBottle(row: SourceBottleRow): SourceBottle {
     house: row.house,
     name: row.name,
     sizeMl: row.size_ml,
-    batchCode: row.batch_code,
+    batchCode: row.batch_code ?? undefined,
     videoUrl: row.video_path,
     receiptUrl: row.receipt_path ?? undefined,
     verifiedAt: row.verified_at ?? undefined,
@@ -78,7 +79,7 @@ export function toListing(row: ListingRow, photoUrl: (path: string) => string = 
     sizeMl: row.size_ml,
     fillPercent: row.fill_percent ?? undefined,
     condition: row.condition,
-    batchCode: row.batch_code,
+    batchCode: row.batch_code ?? undefined,
     pricePence: row.price_pence,
     postagePence: row.postage_pence,
     receiptVerified: row.receipt_verified,
@@ -87,5 +88,6 @@ export function toListing(row: ListingRow, photoUrl: (path: string) => string = 
       .sort((a, b) => a.position - b.position)
       .map((p) => photoUrl(p.path)),
     notes: row.notes,
+    status: row.status,
   };
 }

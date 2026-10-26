@@ -3,21 +3,21 @@
 Work top to bottom. Tick each task as it lands. Before starting: PR #3 is merged and `main` is pulled.
 
 ## Core
-- [ ] Make `batchCode` optional, and add `ListingStatus` and `status` to `Listing` (R-6, AC-8.2)
-- [ ] `validateListingInput`: drop the batch-code and source-bottle errors, and add `photoCount` (R-1 to R-5, R-7). Update the tests
-- [ ] `validateDecantListing`: no bottle means only the 5ml rule; a linked bottle must be the seller's own and have room left (R-7 to R-9). Update the tests
-- [ ] `hasVerifiedSource`, `batchCodeLabel`, `canEditListing`, plus tests (R-6, R-10, R-11)
-- [ ] `decantLabel` without a batch code, plus a test
-- [ ] `filters.ts`: `ListingFilter` and `matchesFilter`, plus tests (AC-7.3)
+- [x] Make `batchCode` optional, and add `ListingStatus` and `status` to `Listing` (R-6, AC-8.2)
+- [x] `validateListingInput`: drop the batch-code and source-bottle errors, and add `photoCount` (R-1 to R-5, R-7). Update the tests
+- [x] `validateDecantListing`: no bottle means only the 5ml rule; a linked bottle must be the seller's own and have room left (R-7 to R-9). Update the tests
+- [x] `hasVerifiedSource`, `batchCodeLabel`, `canEditListing`, plus tests (R-6, R-10, R-11)
+- [x] `decantLabel` without a batch code, plus a test
+- [x] `filters.ts`: `ListingFilter` and `matchesFilter`, plus tests (AC-7.3)
 
 ## Database
 - [ ] `NNNN_baseline.sql`: nullable batch codes, `decant_min_size`, the capacity trigger skips unlinked decants, sold listings are public, sellers can't set `sold`, `updated_at`
 - [ ] Run it on the dev database and check the RLS cases in plan.md
 
 ## Server and api
-- [ ] Row types and mappers: nullable batch code, and `status`
+- [x] Row types and mappers: nullable batch code, and `status`
 - [ ] `listListings` filters (kind, condition, price, certified only, query), and the sample marketplace uses `matchesFilter`
-- [ ] Sample data: a listing with no batch code and an unlinked decant
+- [x] Sample data: a listing with no batch code and an unlinked decant
 - [ ] `removeListing` server action
 
 ## Web

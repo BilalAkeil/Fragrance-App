@@ -44,7 +44,7 @@ export function createMarketplace(config: {
 }
 
 const LISTING_COLUMNS =
-  "id, seller_id, house, name, kind, size_ml, fill_percent, condition, batch_code, price_pence, postage_pence, receipt_verified, source_bottle_id, notes, listing_photos(path, position)";
+  "id, seller_id, house, name, kind, size_ml, fill_percent, condition, batch_code, price_pence, postage_pence, receipt_verified, source_bottle_id, notes, status, listing_photos(path, position)";
 
 export function supabaseMarketplace(client: SupabaseClient): Marketplace {
   const photoUrl = (path: string) =>

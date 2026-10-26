@@ -37,7 +37,7 @@ export function SellForm({ userId, bottles }: { userId: string; bottles: BottleO
       sizeMl: Number(text("sizeMl")),
       fillPercent: kind === "partial" ? Number(text("fillPercent")) : undefined,
       condition: text("condition") as Condition,
-      batchCode: text("batchCode").trim(),
+      batchCode: text("batchCode").trim() || undefined,
       pricePence: parsePounds(text("price")),
       postagePence: parsePounds(text("postage")),
       notes: parseNotes(text("notes")),
@@ -46,8 +46,7 @@ export function SellForm({ userId, bottles }: { userId: string; bottles: BottleO
     const photos = form.getAll("photos").filter((f): f is File => f instanceof File && f.size > 0);
     const receipt = form.get("receipt");
 
-    const found = validateListingInput(input);
-    if (photos.length === 0) found.push("Add at least one photo, including the batch code.");
+    const found = validateListingInput(input, photos.length);
     setErrors(found);
     if (found.length) return;
 
@@ -72,7 +71,7 @@ export function SellForm({ userId, bottles }: { userId: string; bottles: BottleO
           size_ml: input.sizeMl,
           fill_percent: input.fillPercent ?? null,
           condition: input.condition,
-          batch_code: input.batchCode,
+          batch_code: input.batchCode ?? null,
           price_pence: input.pricePence,
           postage_pence: input.postagePence,
           notes: input.notes,
@@ -144,8 +143,8 @@ export function SellForm({ userId, bottles }: { userId: string; bottles: BottleO
             <option value="used">Used</option>
           </select>
         </Field>
-        <Field label="Batch code" hint="Printed on the bottom of the bottle or box.">
-          <input name="batchCode" required className={inputClass} />
+        <Field label="Batch code (optional)" hint="Printed on the bottom of the bottle or box. Leave it empty if there isn't one.">
+          <input name="batchCode" className={inputClass} />
         </Field>
         <Field label="Price (£)">
           <input name="price" inputMode="decimal" required className={inputClass} />

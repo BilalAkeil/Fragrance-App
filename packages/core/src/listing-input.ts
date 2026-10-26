@@ -1,5 +1,5 @@
 import { MIN_DECANT_ML } from "./decants";
-import type { Condition, ListingKind } from "./types";
+import type { Condition, ListingKind, ListingStatus } from "./types";
 
 export interface ListingInput {
   house: string;
@@ -8,7 +8,8 @@ export interface ListingInput {
   sizeMl: number;
   fillPercent?: number;
   condition: Condition;
-  batchCode: string;
+  // Optional: not every bottle has one.
+  batchCode?: string;
   pricePence: number;
   postagePence: number;
   notes: string[];
@@ -29,11 +30,10 @@ export function parseNotes(text: string): string[] {
     .filter(Boolean);
 }
 
-export function validateListingInput(input: ListingInput): string[] {
+export function validateListingInput(input: ListingInput, photoCount: number): string[] {
   const errors: string[] = [];
   if (!input.house.trim()) errors.push("Add the brand.");
   if (!input.name.trim()) errors.push("Add the fragrance name.");
-  if (!input.batchCode.trim()) errors.push("Add the batch code from the bottle or box.");
   if (!Number.isInteger(input.sizeMl) || input.sizeMl <= 0) errors.push("Add the size in ml.");
   if (!Number.isFinite(input.pricePence) || input.pricePence <= 0) errors.push("Add a price.");
   if (!Number.isFinite(input.postagePence) || input.postagePence < 0) {
@@ -45,9 +45,19 @@ export function validateListingInput(input: ListingInput): string[] {
       errors.push("Add how full the bottle is, from 1 to 100%.");
     }
   }
-  if (input.kind === "decant") {
-    if (input.sizeMl < MIN_DECANT_ML) errors.push(`Decants must be at least ${MIN_DECANT_ML}ml.`);
-    if (!input.sourceBottleId) errors.push("Choose the source bottle this decant came from.");
+  if (input.kind === "decant" && input.sizeMl < MIN_DECANT_ML) {
+    errors.push(`Decants must be at least ${MIN_DECANT_ML}ml.`);
   }
+  if (photoCount < 1) errors.push("Add at least one photo of the bottle.");
   return errors;
+}
+
+export function batchCodeLabel(batchCode?: string): string {
+  const code = batchCode?.trim();
+  return code ? `Batch ${code}` : "No batch code";
+}
+
+// Sold and removed listings are final.
+export function canEditListing(status: ListingStatus, isOwner: boolean): boolean {
+  return isOwner && (status === "active" || status === "draft");
 }
