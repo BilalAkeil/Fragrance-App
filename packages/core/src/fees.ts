@@ -1,8 +1,8 @@
 // Sellers pay nothing. Buyers pay a Buyer Protection fee at checkout that
 // covers card processing and refunds for fakes.
 
-// Placeholder rate until the real level is decided.
-export const BUYER_PROTECTION = { percent: 0.04, fixedPence: 50 };
+// 3% + 30p, chosen by Bilal on 2026-10-26 to keep buyer fees low while covering card costs.
+export const BUYER_PROTECTION = { percent: 0.03, fixedPence: 30 };
 
 // Stripe UK rates per successful card payment (stripe.com/gb/pricing).
 export const CARD_RATES = {

@@ -20,6 +20,8 @@ Bilal's decisions, so specs can be checked against them. Where the brief adds de
 | An offer stays open until it is accepted or the item is bought, then the item is marked sold | 2026-10-26 |
 | Money is held until both sides confirm, or 48 hours after delivery or collection | 2026-10-26 |
 | Light blue theme | 2026-10-26 |
+| Buyer Protection fee is 3% + 30p | 2026-10-26 |
+| A failed swap costs the side at fault the full resale value of their item, paid to the other person | 2026-10-26 |
 
 ## What it is
 
@@ -37,7 +39,7 @@ A UK marketplace where fragrance fans **buy, sell and swap** full bottles, parti
 ## How money works (Vinted-style)
 
 - **Sellers pay nothing.**
-- **Buyers pay a Buyer Protection fee** on top of the item price and postage. This is already in `packages/core/src/fees.ts` (placeholder 4% + 50p).
+- **Buyers pay a Buyer Protection fee** on top of the item price and postage. This is already in `packages/core/src/fees.ts`: 3% of the item price + 30p (Bilal, 2026-10-26).
 - **Payment is held** until the order completes. An order completes when the buyer taps "Everything's OK", or automatically **48 hours after tracking shows it delivered, or collected from a locker or pickup point,** if they haven't reported a problem. Reporting a problem in that window pauses completion and opens a dispute.
 - **The seller is paid** into their Stripe Connect account when the order completes.
 
@@ -64,7 +66,7 @@ A UK marketplace where fragrance fans **buy, sell and swap** full bottles, parti
 8. Holds are released, and any cash top-up is paid out.
 9. Both review each other.
 
-If someone doesn't ship by the deadline, or sends a fake (decided in a dispute), their hold is charged to compensate the other person.
+If someone doesn't ship by the deadline, or sends a fake (decided in a dispute), their hold is charged for the full value of the item they promised (its resale value, the catalogue guide price) and paid to the other person as compensation. The other person also gets back any cash top-up and their Swap Protection fee (Bilal, 2026-10-26).
 
 ## Swap rules (decided)
 
@@ -143,7 +145,9 @@ These need answers before the specs that depend on them are agreed.
 - [ ] **Q-1 Name and brand:** what's the working name? Any logo or colours to start the design system from?
   - [x] **Colours:** light blue (Bilal, 2026-10-26), already on the website.
   - [ ] **Name and logo:** Bilal is choosing from a shortlist.
-- [ ] **Q-2 Fee levels:** what are the final Buyer Protection and Swap Protection fees? (Buyer Protection is a 4% + 50p placeholder today.)
+- [ ] **Q-2 Fee levels:** what are the final Buyer Protection and Swap Protection fees?
+  - [x] **Buyer Protection:** 3% + 30p (Bilal, 2026-10-26), the lowest level that still covers card costs with a small buffer for refunds.
+  - [ ] **Swap Protection:** not set yet.
 - [x] **Q-3 Swap deadline:** 5 working days, as Vinted does. Bilal to confirm: the design still shows "[N] working days".
 - [ ] **Q-4 Card hold limits:** a standard Stripe card hold expires after 7 days. A swap is 5 working days to ship, plus delivery, plus the 2-day check, so it will usually run past that. Options: take the payment up front and refund it on completion; use Stripe's extended authorisations where the card is eligible; or re-authorise near expiry. To settle in 007's plan, but it changes the wording users see ("hold" vs "deposit, refunded").
 - [x] **Q-5 Hold value:** the catalogue guide price.
@@ -154,5 +158,5 @@ These need answers before the specs that depend on them are agreed.
 - [ ] **Q-8 Certification:** how many reviews before the 4★ rule applies? (5 is a placeholder.) Do swaps count towards reviews?
 - [x] **Q-9 Who can sell or swap:** ID is verified before anyone can list or swap. Buying needs no ID check.
 - [ ] **Q-10 Mobile timing:** Bilal wants a website and an app, and the product plan has them launching together. This brief puts the app after the web MVP. Is launching web first OK?
-- [ ] **Q-11 What a failed swap costs:** this brief charges the late or dishonest side's card hold to compensate the other person. The design instead says the other person gets their cash and fee refunded. Which do we tell users?
+- [x] **Q-11 What a failed swap costs:** the side at fault is charged the full resale value of the item they promised, which goes to the other person as compensation. The other person's cash top-up and fee are refunded too (Bilal, 2026-10-26). The Trade design's copy needs updating to match. How we collect it depends on Q-4.
 - [ ] **Q-12 Swap or Trade:** this brief says "swap", the design and website say "Trade". Pick one word for users.
