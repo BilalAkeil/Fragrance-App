@@ -19,9 +19,9 @@ export default async function SellPage() {
 
   return (
     <>
-      <h1 className="mb-2 text-2xl font-semibold">Sell a fragrance</h1>
-      <p className="mb-6 opacity-70">
-        Selling is free. <Link href="/account" className="underline">Back to your account</Link>
+      <h1 className="mb-2 text-3xl font-extrabold tracking-tight">Sell a fragrance</h1>
+      <p className="mb-8 text-muted">
+        Selling is free. <Link href="/account" className="font-bold text-brand underline">Back to your account</Link>
       </p>
       <SellForm
         userId={user.id}
