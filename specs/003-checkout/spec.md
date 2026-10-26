@@ -84,7 +84,7 @@ Buyers can't buy anything yet: the Buy button says "checkout coming soon". This 
 
 ## Open questions
 
-- [ ] **Q-1:** What's the final Buyer Protection fee? Today it's a 4% + 50p placeholder. This is brief Q-2.
+- [x] **Q-1:** What's the final Buyer Protection fee? **3% of the item price + 30p** (Bilal, 2026-10-26, PR #8).
 - [ ] **Q-2:** Do sellers set up payouts before their first listing, or before their first sale? Stripe's payout setup also checks ID, so it could double as the ID check in 005. Should it?
 - [ ] **Q-3:** How long does a checkout reservation hold a listing (for example 10 minutes)?
 - [ ] **Q-4:** Do we offer Apple Pay and Google Pay at launch, or cards only?

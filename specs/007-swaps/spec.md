@@ -82,7 +82,7 @@ Fragrance fans often have bottles they're bored of and bottles they want. Swappi
   - the person who did ship gets their item back at our cost
   - their fee and hold are returned
   - any cash they paid is refunded
-- **AC-7.2:** The person who didn't ship is charged as Q-2 decides: their hold, or only their fee.
+- **AC-7.2:** The person who didn't ship is charged the full guide value of the items they promised, and that money is paid to the other person as compensation (Bilal, 2026-10-26).
 
 ## Rules
 
@@ -102,6 +102,7 @@ Fragrance fans often have bottles they're bored of and bottles they want. Swappi
   It can also end as Declined, Withdrawn, Lapsed, Closed (an item went elsewhere), Cancelled (someone didn't ship), or Disputed (008).
 - **R-8:** Nothing is charged before acceptance.
 - **R-9:** Each side pays the postage for the parcel they send, chosen when they pay (Q-5).
+- **R-10:** When a swap fails because one side doesn't ship or sends a fake (decided in 008), the side at fault is charged the full guide value of the items they promised, which is paid to the other side. The other side also gets back their Swap Protection fee and any cash they paid.
 
 ## Data
 
@@ -128,8 +129,8 @@ Fragrance fans often have bottles they're bored of and bottles they want. Swappi
 ## Open questions
 
 - [ ] **Q-1:** "Swap" or "Trade" for users? This is brief Q-12.
-- [ ] **Q-2:** When someone doesn't ship or sends a fake, do we charge their hold to compensate the other person, or refund the other person's cash and fee only? This is brief Q-11; the brief and the design disagree.
-- [ ] **Q-3:** What's the Swap Protection fee? This is brief Q-2. Does Buyer Protection also apply to the cash part?
+- [x] **Q-2:** When someone doesn't ship or sends a fake, what does it cost them? **The full guide value of what they promised, paid to the other person, who also gets their fee and cash back** (Bilal, 2026-10-26, PR #8). How it's collected depends on Q-4. The Trade design's copy needs updating to match.
+- [ ] **Q-3:** What's the Swap Protection fee? This is brief Q-2; Buyer Protection is settled at 3% + 30p. Does Buyer Protection also apply to the cash part?
 - [ ] **Q-4:** A card hold normally lasts 7 days, and a swap can run longer. Do we take a deposit and refund it, use extended holds, or re-hold near expiry? This is brief Q-4. It changes the words users see: "hold" or "deposit".
 - [ ] **Q-5:** Does each side pay their own postage (as R-9 assumes)?
 - [ ] **Q-6:** How long does the second person have to pay after acceptance (24 hours is assumed)?

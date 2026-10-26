@@ -44,14 +44,15 @@ Each step can be built and released before the next one starts.
 
 Every open question from the brief and the specs, grouped by who can answer it. Settle the first group first, because it blocks the most specs.
 
+Already settled by Bilal in PR #8: Buyer Protection is 3% + 30p (003 Q-1). A failed swap costs the side at fault the full guide value of what they promised, paid to the other side, who also gets their fee and cash back (007 Q-2).
+
 ### Settle first (Ben and Bilal)
 
 | Question | Where | Blocks |
 | --- | --- | --- |
 | The product name and logo | Brief Q-1 | Design, emails (010), domain |
-| Final Buyer Protection and Swap Protection fees, and whether Buyer Protection applies to cash in a swap | Brief Q-2, 003 Q-1, 007 Q-3 | 003, 007 |
+| The Swap Protection fee, and whether Buyer Protection applies to cash in a swap. Buyer Protection is settled at 3% + 30p (Bilal, PR #8) | Brief Q-2, 007 Q-3 | 007 |
 | "Swap" or "Trade" for users | Brief Q-12, 007 Q-1 | 007, copy everywhere |
-| What a failed swap costs the person at fault: charge their hold, or only refund the other side | Brief Q-11, 007 Q-2 | 007, 008 |
 | Is launching web before the mobile app OK? | Brief Q-10 | Scope |
 | Do sellers set up payouts before their first listing or their first sale, and does Stripe's payout setup double as the ID check? | 003 Q-2, 005 Q-5 | 003, 005 |
 

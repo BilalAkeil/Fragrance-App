@@ -60,7 +60,7 @@ Buyer Protection and Swap Protection are only real if problems get sorted out fa
 ### US-5: As a swapper, I want the same protection
 
 - **AC-5.1:** In a swap, each side can report a problem with the parcel they received, within 48 hours of its delivery.
-- **AC-5.2:** Given the decision goes against the sender, then the person who reported is compensated as 007 Q-2 decides: from the sender's hold, or by refunding their own fee and cash. The swap doesn't complete for either side until it's resolved.
+- **AC-5.2:** Given the decision goes against the sender, then the sender is charged the full guide value of what they sent, and that's paid to the person who reported. The person who reported also gets back their fee and any cash they paid (007, R-10). The swap doesn't complete for either side until it's resolved.
 
 ## Rules
 
