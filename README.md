@@ -9,6 +9,7 @@ A UK marketplace for buying and selling fragrances (full bottles, partials and d
 | `apps/web` | Website, built with Next.js |
 | `apps/mobile` | iOS and Android app, built with Expo (React Native) |
 | `packages/core` | Shared rules used by both: fees, seller certification, decant checks, types |
+| `packages/api` | Reads listings and sellers from Supabase, or sample data when no keys are set |
 | `supabase/migrations` | Database schema |
 
 ## Rules in `packages/core`
@@ -27,3 +28,12 @@ npm run dev:mobile  # mobile app via Expo Go
 ```
 
 Screens use sample data from `packages/core/src/sample-data.ts` until Supabase is connected.
+
+## Setting up Supabase
+
+1. In the Supabase dashboard, open **SQL Editor**, paste `supabase/migrations/0001_init.sql`, and run it. Then do the same with `0002_security.sql`.
+2. Open **Project Settings > API** and copy the project URL and the `anon` public key.
+3. Website: copy `apps/web/.env.example` to `apps/web/.env.local` and fill in both values.
+4. Mobile: copy `apps/mobile/.env.example` to `apps/mobile/.env` and fill in both values.
+
+The `anon` key is safe to ship in the apps because `0002_security.sql` turns on row level security for every table. Never put the `service_role` key in either app.

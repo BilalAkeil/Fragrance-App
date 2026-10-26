@@ -13,7 +13,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "next": "15.5.28",
-    "@fragrance/core": "*"
+    "@fragrance/core": "*",
+    "@fragrance/api": "*"
   },
   "devDependencies": {
     "typescript": "^5",

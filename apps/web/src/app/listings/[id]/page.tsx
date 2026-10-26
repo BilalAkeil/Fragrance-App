@@ -1,25 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  checkoutBreakdown,
-  formatGBP,
-  sampleListings,
-  sampleSellers,
-  sampleSourceBottles,
-} from "@fragrance/core";
+import { checkoutBreakdown, formatGBP } from "@fragrance/core";
 import { SellerBadge } from "@/components/SellerBadge";
+import { marketplace } from "@/lib/marketplace";
 
-export function generateStaticParams() {
-  return sampleListings.map((l) => ({ id: l.id }));
-}
+export const revalidate = 60;
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const listing = sampleListings.find((l) => l.id === id);
+  const listing = await marketplace.getListing(id);
   if (!listing) notFound();
 
-  const seller = sampleSellers.find((s) => s.id === listing.sellerId)!;
-  const bottle = sampleSourceBottles.find((b) => b.id === listing.sourceBottleId);
+  const [[seller], bottle] = await Promise.all([
+    marketplace.getSellers([listing.sellerId]),
+    listing.sourceBottleId ? marketplace.getSourceBottle(listing.sourceBottleId) : undefined,
+  ]);
   const price = checkoutBreakdown(listing.pricePence, listing.postagePence);
 
   return (
