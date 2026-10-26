@@ -12,8 +12,8 @@ export default async function RegisterBottlePage() {
 
   return (
     <>
-      <h1 className="mb-2 text-2xl font-semibold">Register a bottle for decants</h1>
-      <p className="mb-6 opacity-70">
+      <h1 className="mb-2 text-3xl font-extrabold tracking-tight">Register a bottle for decants</h1>
+      <p className="mb-8 text-muted">
         Our team checks the video before you can sell decants from this bottle. You can sell decants
         up to the bottle&apos;s size in total.
       </p>

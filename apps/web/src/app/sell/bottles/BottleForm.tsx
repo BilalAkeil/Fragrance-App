@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Field, inputClass } from "@/components/Field";
 import { createClient } from "@/lib/supabase/client";
 import { uploadToOwnFolder } from "@/lib/upload";
+import { buttonPrimary } from "@/components/ui";
 
 export function BottleForm({ userId }: { userId: string }) {
   const router = useRouter();
@@ -47,7 +48,7 @@ export function BottleForm({ userId }: { userId: string }) {
   }
 
   return (
-    <form onSubmit={submit} className="grid max-w-xl gap-4">
+    <form onSubmit={submit} className="grid max-w-2xl gap-5 rounded-2xl border border-line bg-white p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Brand">
           <input name="house" required className={inputClass} />
@@ -71,10 +72,10 @@ export function BottleForm({ userId }: { userId: string }) {
       <Field label="Proof of purchase (optional)">
         <input name="receipt" type="file" accept="image/*,application/pdf" className={inputClass} />
       </Field>
-      {error && <p className="text-sm text-red-700 dark:text-red-300">{error}</p>}
+      {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
       <button
         disabled={saving}
-        className="rounded-lg bg-black px-4 py-2 font-medium text-white disabled:opacity-60 dark:bg-white dark:text-black"
+        className={`${buttonPrimary} justify-self-start`}
       >
         {saving ? "Uploading…" : "Register bottle"}
       </button>

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { inputClass } from "@/components/Field";
+import { buttonPrimary } from "@/components/ui";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -25,25 +27,29 @@ export function LoginForm() {
   }
 
   if (state === "sent") {
-    return <p>Check {email} for a sign-in link.</p>;
+    return (
+      <p className="max-w-md rounded-2xl bg-verified-tint p-6 font-semibold text-verified-ink">
+        Check {email} for a sign-in link.
+      </p>
+    );
   }
 
   return (
-    <form onSubmit={submit} className="flex max-w-sm flex-col gap-3">
-      <label className="flex flex-col gap-1 text-sm">
+    <form onSubmit={submit} className="flex max-w-md flex-col gap-4 rounded-2xl border border-line bg-white p-6">
+      <label className="flex flex-col gap-1.5 text-sm font-bold">
         Email
         <input
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-lg border border-black/15 bg-transparent px-3 py-2 dark:border-white/20"
+          className={inputClass}
         />
       </label>
-      {error && <p className="text-sm text-red-700 dark:text-red-300">{error}</p>}
+      {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
       <button
         disabled={state === "sending"}
-        className="rounded-lg bg-black px-4 py-2 font-medium text-white disabled:opacity-60 dark:bg-white dark:text-black"
+        className={buttonPrimary}
       >
         {state === "sending" ? "Sending…" : "Email me a sign-in link"}
       </button>

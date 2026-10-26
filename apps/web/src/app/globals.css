@@ -1,24 +1,29 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Colours and type from the Claude Design canvas (light blue theme). */
+@theme {
+  --color-ink: #17151c;
+  --color-muted: #5f5b66;
+  --color-line: #dce7f2;
+  --color-field: #c3d3e4;
+  --color-mist: #eaf4fd;
+  --color-mist-line: #cfe2f3;
+  --color-panel: #f2f8fd;
+  --color-sky: #e3f0fb;
+  --color-brand: #1f5fa8;
+  --color-brand-dark: #17487f;
+  --color-tile-icon: #4a6b8a;
+  --color-verified: #0b6b5e;
+  --color-verified-ink: #0b5a4f;
+  --color-verified-tint: #e3f3ef;
+  --color-neutral-tint: #eaf1f8;
+  --color-neutral-ink: #4a4652;
+  --color-decant-tint: #f7ede6;
+  --color-decant-ink: #6a3a12;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-manrope), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
