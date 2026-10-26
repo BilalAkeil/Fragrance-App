@@ -1,77 +1,113 @@
-"use client";
-
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { formatGBP, type Listing, type ListingKind, type Seller } from "@fragrance/core";
+import { formatGBP, type ListingFilter, type Listing, type ListingKind, type Seller } from "@fragrance/core";
 import { BottleTile } from "./BottleTile";
 import { inputClass } from "./Field";
-import { KIND_LABELS } from "./labels";
+import { CONDITION_LABELS, KIND_LABELS } from "./labels";
 import { SellerBadge } from "./SellerBadge";
+import { buttonPrimary } from "./ui";
 
-const FILTERS: { value: ListingKind | "all"; label: string }[] = [
-  { value: "all", label: "Everything" },
+const KIND_FILTERS: { value?: ListingKind; label: string }[] = [
+  { label: "Everything" },
   { value: "full", label: "Full bottles" },
   { value: "partial", label: "Partials" },
   { value: "decant", label: "Decants" },
 ];
 
+const pounds = (pence?: number) => (pence === undefined ? "" : String(pence / 100));
+
+// The browse URL for a filter, e.g. /?q=oud&kind=decant&certified=1#listings
+export function browseHref(filter: ListingFilter): string {
+  const params = new URLSearchParams();
+  if (filter.query) params.set("q", filter.query);
+  if (filter.kind) params.set("kind", filter.kind);
+  if (filter.condition) params.set("condition", filter.condition);
+  if (filter.minPence !== undefined) params.set("min", pounds(filter.minPence));
+  if (filter.maxPence !== undefined) params.set("max", pounds(filter.maxPence));
+  if (filter.certifiedOnly) params.set("certified", "1");
+  const query = params.toString();
+  return `/${query ? `?${query}` : ""}#listings`;
+}
+
+// Results come already filtered from the server; the filters live in the URL.
 export function ListingBrowser({
   listings,
   sellers,
-  initialQuery = "",
+  filter,
 }: {
   listings: Listing[];
   sellers: Seller[];
-  initialQuery?: string;
+  filter: ListingFilter;
 }) {
-  const [query, setQuery] = useState(initialQuery);
-  const [kind, setKind] = useState<ListingKind | "all">("all");
-
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return listings.filter((l) => {
-      if (kind !== "all" && l.kind !== kind) return false;
-      if (!q) return true;
-      return [l.house, l.name, ...l.notes].some((s) => s.toLowerCase().includes(q));
-    });
-  }, [listings, query, kind]);
+  const filtered = Object.keys(filter).length > 0;
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center">
-        <label htmlFor="listing-search" className="sr-only">
-          Search listings
-        </label>
-        <input
-          id="listing-search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by brand, name or note"
-          className={`${inputClass} flex-1`}
-        />
+      <div className="flex flex-col gap-4">
         <div role="group" aria-label="Type" className="flex flex-wrap gap-2">
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              type="button"
-              aria-pressed={kind === f.value}
-              onClick={() => setKind(f.value)}
-              className={`min-h-11 rounded-full border px-4 text-sm font-bold ${
-                kind === f.value ? "border-brand bg-brand text-white" : "border-field bg-white text-ink hover:border-brand"
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+          {KIND_FILTERS.map((f) => {
+            const active = filter.kind === f.value;
+            return (
+              <Link
+                key={f.label}
+                href={browseHref({ ...filter, kind: f.value })}
+                aria-current={active ? "true" : undefined}
+                className={`inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-bold ${
+                  active ? "border-brand bg-brand text-white" : "border-field bg-white text-ink hover:border-brand"
+                }`}
+              >
+                {f.label}
+              </Link>
+            );
+          })}
         </div>
+        <form action="/#listings" className="flex flex-wrap items-end gap-3 text-sm">
+          {filter.query && <input type="hidden" name="q" value={filter.query} />}
+          {filter.kind && <input type="hidden" name="kind" value={filter.kind} />}
+          <label className="flex flex-col gap-1 font-bold">
+            Condition
+            <select name="condition" defaultValue={filter.condition ?? ""} className={inputClass}>
+              <option value="">Any</option>
+              {Object.entries(CONDITION_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1 font-bold">
+            Min price (£)
+            <input name="min" inputMode="decimal" defaultValue={pounds(filter.minPence)} className={`${inputClass} w-28`} />
+          </label>
+          <label className="flex flex-col gap-1 font-bold">
+            Max price (£)
+            <input name="max" inputMode="decimal" defaultValue={pounds(filter.maxPence)} className={`${inputClass} w-28`} />
+          </label>
+          <label className="flex min-h-11 items-center gap-2 font-bold">
+            <input type="checkbox" name="certified" value="1" defaultChecked={filter.certifiedOnly} className="size-4" />
+            Certified sellers only
+          </label>
+          <button className={buttonPrimary}>Apply</button>
+          {filtered && (
+            <Link href="/#listings" className="min-h-11 content-center font-bold text-brand underline">
+              Clear filters
+            </Link>
+          )}
+        </form>
       </div>
 
-      {results.length === 0 ? (
-        <p className="text-muted">No fragrances match your search.</p>
+      {listings.length === 0 ? (
+        <div className="flex flex-col items-start gap-2">
+          <p className="text-muted">No fragrances match your search.</p>
+          {filtered && (
+            <Link href="/#listings" className="font-bold text-brand underline">
+              Clear filters
+            </Link>
+          )}
+        </div>
       ) : (
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-x-5 gap-y-8">
-          {results.map((l) => {
-            const seller = sellers.find((s) => s.id === l.sellerId)!;
+          {listings.map((l) => {
+            const seller = sellers.find((s) => s.id === l.sellerId);
             return (
               <li key={l.id}>
                 <Link href={`/listings/${l.id}`} className="group flex flex-col gap-2.5 text-ink">
@@ -88,10 +124,12 @@ export function ListingBrowser({
                       {l.sizeMl}ml{l.fillPercent !== undefined ? ` · ${l.fillPercent}% full` : ""}
                     </span>
                     <span className="mt-1 text-[17px] font-extrabold">{formatGBP(l.pricePence)}</span>
-                    <span className="mt-1 flex flex-wrap items-center gap-2 text-[13px]">
-                      <span className="text-muted">{seller.displayName}</span>
-                      <SellerBadge seller={seller} />
-                    </span>
+                    {seller && (
+                      <span className="mt-1 flex flex-wrap items-center gap-2 text-[13px]">
+                        <span className="text-muted">{seller.displayName}</span>
+                        <SellerBadge seller={seller} />
+                      </span>
+                    )}
                   </div>
                 </Link>
               </li>

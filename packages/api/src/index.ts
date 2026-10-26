@@ -1,10 +1,12 @@
 import { createClient, type SupabaseClient, type SupportedStorage } from "@supabase/supabase-js";
 import {
+  certificationStatus,
+  matchesFilter,
   sampleListings,
   sampleSellers,
   sampleSourceBottles,
   type Listing,
-  type ListingKind,
+  type ListingFilter,
   type Seller,
   type SourceBottle,
 } from "@fragrance/core";
@@ -23,7 +25,8 @@ export * from "./rows";
 export interface Marketplace {
   // False when no Supabase keys are set and sample data is being shown.
   live: boolean;
-  listListings(filter?: { query?: string; kind?: ListingKind }): Promise<Listing[]>;
+  // Active listings, newest first.
+  listListings(filter?: ListingFilter): Promise<Listing[]>;
   getListing(id: string): Promise<Listing | undefined>;
   getSellers(ids: string[]): Promise<Seller[]>;
   getSourceBottle(id: string): Promise<SourceBottle | undefined>;
@@ -61,6 +64,9 @@ export function supabaseMarketplace(client: SupabaseClient): Marketplace {
         .order("created_at", { ascending: false })
         .limit(60);
       if (filter.kind) q = q.eq("kind", filter.kind);
+      if (filter.condition) q = q.eq("condition", filter.condition);
+      if (filter.minPence !== undefined) q = q.gte("price_pence", filter.minPence);
+      if (filter.maxPence !== undefined) q = q.lte("price_pence", filter.maxPence);
       if (filter.query?.trim()) {
         q = q.textSearch("search", filter.query.trim(), {
           type: "websearch",
@@ -69,7 +75,12 @@ export function supabaseMarketplace(client: SupabaseClient): Marketplace {
       }
       const { data, error } = await q;
       if (error) throw error;
-      return (data as unknown as ListingRow[]).map((r) => toListing(r, photoUrl));
+      const listings = (data as unknown as ListingRow[]).map((r) => toListing(r, photoUrl));
+      if (!filter.certifiedOnly) return listings;
+      // Certification is a core rule, so it's applied here rather than in SQL.
+      const sellers = await this.getSellers([...new Set(listings.map((l) => l.sellerId))]);
+      const certified = new Set(sellers.filter((s) => certificationStatus(s) === "certified").map((s) => s.id));
+      return listings.filter((l) => certified.has(l.sellerId));
     },
 
     async getListing(id) {
@@ -109,11 +120,8 @@ export function supabaseMarketplace(client: SupabaseClient): Marketplace {
 export const sampleMarketplace: Marketplace = {
   live: false,
   async listListings(filter = {}) {
-    const q = filter.query?.trim().toLowerCase();
     return sampleListings.filter(
-      (l) =>
-        (!filter.kind || l.kind === filter.kind) &&
-        (!q || [l.house, l.name, ...l.notes].some((s) => s.toLowerCase().includes(q))),
+      (l) => l.status === "active" && matchesFilter(l, sampleSellers.find((s) => s.id === l.sellerId), filter),
     );
   },
   async getListing(id) {

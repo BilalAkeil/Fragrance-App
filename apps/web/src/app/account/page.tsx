@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { formatGBP } from "@fragrance/core";
+import { canEditListing, formatGBP, type ListingKind } from "@fragrance/core";
 import { NotConnected } from "@/components/NotConnected";
 import { supabaseConfigured } from "@/lib/supabase/config";
 import { inputClass } from "@/components/Field";
 import { buttonPrimary, buttonSecondary, pageTitle, panel } from "@/components/ui";
+import { KIND_LABELS } from "@/components/labels";
+import { BOTTLE_STATUS_LABELS, loadOwnBottles } from "@/lib/bottles";
 import { getCurrentSeller } from "@/lib/supabase/server";
+import { RemoveListingButton } from "../listings/[id]/RemoveListingButton";
 import { createSellerProfile, signOut } from "./actions";
 
 const ERRORS: Record<string, string> = {
@@ -13,39 +16,50 @@ const ERRORS: Record<string, string> = {
   save: "That name couldn't be saved. Please try again.",
 };
 
-export default async function AccountPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+const LISTING_GROUPS = [
+  { status: "active", label: "Active" },
+  { status: "sold", label: "Sold" },
+  { status: "removed", label: "Removed" },
+] as const;
+
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; removed?: string }>;
+}) {
   if (!supabaseConfigured) return <NotConnected />;
   const { supabase, user, seller } = await getCurrentSeller();
   if (!user) redirect("/login");
-  const { error } = await searchParams;
+  const { error, removed } = await searchParams;
 
-  const [listings, bottles, rejections] = seller
+  const [listings, bottles, receiptRejections] = seller
     ? await Promise.all([
         supabase
           .from("listings")
           .select("id, house, name, kind, size_ml, price_pence, status, receipt_path")
           .eq("seller_id", user.id)
           .order("created_at", { ascending: false }),
-        supabase
-          .from("source_bottles")
-          .select("id, house, name, size_ml, verified_at, video_path")
-          .eq("seller_id", user.id),
+        loadOwnBottles(supabase, user.id),
         // Only the seller and admins can read these.
         supabase
           .from("review_decisions")
-          .select("item_type, item_id, item_path, reason")
+          .select("item_id, item_path, reason")
           .eq("seller_id", user.id)
+          .eq("item_type", "receipt")
           .eq("approved", false)
           .order("decided_at"),
       ])
-    : [null, null, null];
+    : [null, [], null];
 
   // A rejection only applies to the file it was made on. Later ones overwrite earlier ones.
   const reasons = new Map(
-    (rejections?.data ?? []).map((r) => [`${r.item_type}:${r.item_id}:${r.item_path}`, r.reason as string]),
+    (receiptRejections?.data ?? []).map((r) => [`${r.item_id}:${r.item_path}`, r.reason as string]),
   );
-  const rejectedReason = (type: "bottle" | "receipt", id: string, path: string | null) =>
-    path ? reasons.get(`${type}:${id}:${path}`) : undefined;
+  const receiptReason = (id: string, path: string | null) => (path ? reasons.get(`${id}:${path}`) : undefined);
+  const groups = LISTING_GROUPS.map((g) => ({
+    ...g,
+    listings: (listings?.data ?? []).filter((l) => l.status === g.status),
+  }));
 
   return (
     <div className="space-y-8">
@@ -89,57 +103,84 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             </div>
           </section>
 
-          <section>
-            <h2 className="mb-2 text-lg font-extrabold">Your listings</h2>
-            {listings?.data?.length ? (
-              <ul className="divide-y divide-line">
-                {listings.data.map((l) => {
-                  const receiptReason = rejectedReason("receipt", l.id, l.receipt_path);
-                  return (
-                    <li key={l.id} className="flex justify-between py-2 text-sm">
-                      <Link href={`/listings/${l.id}`} className="hover:underline">
-                        {l.house} {l.name}, {l.size_ml}ml {l.kind}
-                      </Link>
-                      <span className="text-right">
-                        {formatGBP(l.price_pence)} · {l.status}
-                        {receiptReason && (
-                          <span className="block text-xs text-danger">Receipt not approved: {receiptReason}</span>
-                        )}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p className="text-sm text-muted">Nothing listed yet.</p>
+          <section className="flex flex-col gap-4">
+            <h2 className="text-lg font-extrabold">Your listings</h2>
+            {removed && <p className="rounded-xl bg-sky px-4 py-3 text-sm">Your listing has been removed.</p>}
+            {!listings?.data?.length && <p className="text-sm text-muted">Nothing listed yet.</p>}
+            {groups.map(
+              (g) =>
+                g.listings.length > 0 && (
+                  <div key={g.status}>
+                    <h3 className="text-sm font-bold text-muted">
+                      {g.label} ({g.listings.length})
+                    </h3>
+                    <ul className="divide-y divide-line">
+                      {g.listings.map((l) => {
+                        const reason = receiptReason(l.id, l.receipt_path);
+                        return (
+                          <li key={l.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
+                            <span>
+                              {g.status === "removed" ? (
+                                <span className="text-muted">
+                                  {l.house} {l.name}, {l.size_ml}ml {KIND_LABELS[l.kind as ListingKind].toLowerCase()}
+                                </span>
+                              ) : (
+                                <Link href={`/listings/${l.id}`} className="hover:underline">
+                                  {l.house} {l.name}, {l.size_ml}ml {KIND_LABELS[l.kind as ListingKind].toLowerCase()}
+                                </Link>
+                              )}
+                              {reason && <span className="block text-xs text-danger">Receipt not approved: {reason}</span>}
+                            </span>
+                            <span className="flex flex-wrap items-center gap-3">
+                              {formatGBP(l.price_pence)}
+                              {canEditListing(l.status, true) && (
+                                <>
+                                  <Link href={`/listings/${l.id}/edit`} className="font-bold text-brand hover:underline">
+                                    Edit
+                                  </Link>
+                                  <RemoveListingButton listingId={l.id} className="font-bold text-danger hover:underline" />
+                                </>
+                              )}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ),
             )}
           </section>
 
           <section>
             <h2 className="mb-2 text-lg font-extrabold">Bottles registered for decants</h2>
-            {bottles?.data?.length ? (
+            {bottles.length ? (
               <ul className="divide-y divide-line text-sm">
-                {bottles.data.map((b) => {
-                  const bottleReason = rejectedReason("bottle", b.id, b.video_path);
-                  return (
-                    <li key={b.id} className="flex justify-between py-2">
-                      <span>
-                        {b.house} {b.name}, {b.size_ml}ml
-                      </span>
+                {bottles.map((b) => (
+                  <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                    <span>
+                      {b.house} {b.name}, {b.sizeMl}ml
+                    </span>
+                    <span className="flex flex-wrap items-center gap-3 text-right">
                       <span
                         className={
-                          b.verified_at ? "font-semibold text-verified" : bottleReason ? "text-danger" : "text-muted"
+                          b.review.status === "checked"
+                            ? "font-semibold text-verified"
+                            : b.review.status === "rejected"
+                              ? "text-danger"
+                              : "text-muted"
                         }
                       >
-                        {b.verified_at
-                          ? "Video checked"
-                          : bottleReason
-                            ? `Not approved: ${bottleReason}`
-                            : "Waiting for video check"}
+                        {BOTTLE_STATUS_LABELS[b.review.status]}
+                        {b.review.status === "rejected" && `: ${b.review.reason}`}
                       </span>
-                    </li>
-                  );
-                })}
+                      {b.review.status !== "checked" && (
+                        <Link href={`/sell/bottles/${b.id}/edit`} className="font-bold text-brand hover:underline">
+                          Change
+                        </Link>
+                      )}
+                    </span>
+                  </li>
+                ))}
               </ul>
             ) : (
               <p className="text-sm text-muted">None yet.</p>

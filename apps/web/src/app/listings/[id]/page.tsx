@@ -2,18 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { batchCodeLabel, checkoutBreakdown, formatGBP, hasVerifiedSource } from "@fragrance/core";
 import { BottleTile } from "@/components/BottleTile";
-import { KIND_LABELS } from "@/components/labels";
+import { CONDITION_LABELS, KIND_LABELS } from "@/components/labels";
 import { SellerBadge } from "@/components/SellerBadge";
 import { buttonPrimary, panel } from "@/components/ui";
 import { marketplace } from "@/lib/marketplace";
+import { OwnerActions } from "./OwnerActions";
 
 export const revalidate = 60;
-
-const CONDITION_LABELS = {
-  new_sealed: "New, sealed",
-  new_unsealed: "New, unsealed",
-  used: "Used",
-} as const;
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -26,6 +21,8 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   ]);
   const price = checkoutBreakdown(listing.pricePence, listing.postagePence);
   const title = `${listing.house} ${listing.name}`;
+  const verifiedSource = hasVerifiedSource(listing, bottle);
+  const available = listing.status === "active";
 
   return (
     <article className="flex flex-col gap-10">
@@ -68,7 +65,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
               {listing.receiptVerified && (
                 <span className="rounded-full bg-verified-tint px-3 py-1 text-verified-ink">Receipt verified</span>
               )}
-              {hasVerifiedSource(listing, bottle) && (
+              {verifiedSource && (
                 <span className="rounded-full bg-verified-tint px-3 py-1 text-verified-ink">Verified source</span>
               )}
             </div>
@@ -83,14 +80,22 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                 <Row label="Total" value={formatGBP(price.buyerTotalPence)} bold />
               </div>
             </dl>
-            <button disabled className={`${buttonPrimary} w-full`}>
-              Buy now (checkout coming soon)
-            </button>
+            {available ? (
+              <button disabled className={`${buttonPrimary} w-full`}>
+                Buy now (checkout coming soon)
+              </button>
+            ) : (
+              <p className="rounded-xl bg-neutral-tint px-4 py-3 text-center font-bold text-neutral-ink">
+                {listing.status === "sold" ? "Sold" : "No longer available"}
+              </p>
+            )}
             <p className="text-[13px] leading-normal text-muted">
               Your payment is held until you confirm delivery. Refunded in full if the item isn&apos;t as described or
               isn&apos;t genuine.
             </p>
           </div>
+
+          <OwnerActions listingId={listing.id} sellerId={listing.sellerId} status={listing.status} />
 
           <div className="flex items-center gap-3.5 rounded-2xl border border-line p-4">
             <span className="flex size-12 flex-none items-center justify-center rounded-full bg-sky font-extrabold text-brand">
@@ -112,7 +117,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
       </div>
 
       <div className="flex flex-wrap gap-12">
-        {hasVerifiedSource(listing, bottle) && bottle && (
+        {verifiedSource && bottle && (
           <section className="flex min-w-0 flex-[1_1_440px] flex-col gap-4">
             <h2 className="text-xl font-extrabold">Where this decant came from</h2>
             <div className="flex flex-col gap-1.5 rounded-2xl bg-panel p-5">
