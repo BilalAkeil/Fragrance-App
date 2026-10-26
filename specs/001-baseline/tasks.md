@@ -11,7 +11,7 @@ Work top to bottom. Tick each task as it lands. Before starting: PR #3 is merged
 - [x] `filters.ts`: `ListingFilter` and `matchesFilter`, plus tests (AC-7.3)
 
 ## Database
-- [ ] `NNNN_baseline.sql`: nullable batch codes, `decant_min_size`, the capacity trigger skips unlinked decants, sold listings are public, sellers can't set `sold`, `updated_at`
+- [x] `0005_baseline.sql`: nullable batch codes, `decant_min_size`, the capacity trigger skips unlinked decants, sold listings are public, sellers can't set `sold`, `updated_at`
 - [ ] Run it on the dev database and check the RLS cases in plan.md
 
 ## Server and api
