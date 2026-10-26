@@ -103,7 +103,7 @@ export default async function ReviewQueuePage({
     <div className="flex flex-col gap-5">
       <div>
         <h1 className={pageTitle}>Review queue</h1>
-        <p className="text-muted">Oldest first. Decants can&apos;t be listed until their bottle is approved.</p>
+        <p className="text-muted">Oldest first. An approved bottle gives its decants the Verified source badge.</p>
       </div>
 
       {queue.length === 0 ? (
