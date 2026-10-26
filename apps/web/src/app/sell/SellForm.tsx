@@ -13,6 +13,7 @@ import {
 import { Field, inputClass } from "@/components/Field";
 import { createClient } from "@/lib/supabase/client";
 import { uploadToOwnFolder } from "@/lib/upload";
+import { buttonPrimary } from "@/components/ui";
 
 export interface BottleOption {
   id: string;
@@ -96,7 +97,7 @@ export function SellForm({ userId, bottles }: { userId: string; bottles: BottleO
   }
 
   return (
-    <form onSubmit={submit} className="grid max-w-xl gap-4">
+    <form onSubmit={submit} className="grid max-w-2xl gap-5 rounded-2xl border border-line bg-white p-6">
       <Field label="What are you selling?">
         <select value={kind} onChange={(e) => setKind(e.target.value as ListingKind)} className={inputClass}>
           <option value="full">Full bottle</option>
@@ -115,8 +116,8 @@ export function SellForm({ userId, bottles }: { userId: string; bottles: BottleO
               ))}
             </select>
           ) : (
-            <span className="text-sm opacity-70">
-              You have no checked bottles yet. <a href="/sell/bottles" className="underline">Register one first.</a>
+            <span className="text-sm text-muted">
+              You have no checked bottles yet. <a href="/sell/bottles" className="font-bold text-brand underline">Register one first.</a>
             </span>
           )}
         </Field>
@@ -163,7 +164,7 @@ export function SellForm({ userId, bottles }: { userId: string; bottles: BottleO
         <input name="receipt" type="file" accept="image/*,application/pdf" className={inputClass} />
       </Field>
       {errors.length > 0 && (
-        <ul className="list-disc pl-5 text-sm text-red-700 dark:text-red-300">
+        <ul className="list-disc rounded-xl bg-red-50 py-3 pl-8 pr-4 text-sm text-red-800">
           {errors.map((e) => (
             <li key={e}>{e}</li>
           ))}
@@ -171,7 +172,7 @@ export function SellForm({ userId, bottles }: { userId: string; bottles: BottleO
       )}
       <button
         disabled={saving}
-        className="rounded-lg bg-black px-4 py-2 font-medium text-white disabled:opacity-60 dark:bg-white dark:text-black"
+        className={`${buttonPrimary} justify-self-start`}
       >
         {saving ? "Listing…" : "List it"}
       </button>
