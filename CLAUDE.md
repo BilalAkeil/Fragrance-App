@@ -10,7 +10,7 @@ No feature code without a merged spec.
 2. Write `spec.md`: what and why, user stories, acceptance criteria, design link, open questions. No tech choices.
 3. Settle every open question, then open a spec-only PR for review.
 4. Once merged, write `plan.md` (how) and `tasks.md` (ordered checklist), checked against the rules below.
-5. Build the tasks, ticking them off. The feature PR links its spec.
+5. Build the tasks, ticking them off. The feature PR links its spec. Run `/build-feature NNN` to do this the same way on either of our machines. It claims the feature by opening a draft PR first, so only one person builds a feature at a time.
 
 If building shows the spec is wrong, update `spec.md` in the same PR rather than drifting from it.
 
