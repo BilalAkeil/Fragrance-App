@@ -1,4 +1,4 @@
-# 001: Admin review queue
+# 009: Admin review queue
 
 - **Status:** Agreed (Bilal asked for it on 2026-10-26; this spec was written after the code, since it predates the spec-first rule)
 - **Design:** Admin review queue frame in the website design canvas, https://claude.ai/artifact/TKetzr4s94dqRjyZ4SH1hX
@@ -48,11 +48,14 @@ Sellers submit proof that the platform has to check by hand: a video of each sou
 - **R-1:** Only admins can approve or reject anything, or change a seller's ID status. This is enforced in the database, not only in the page.
 - **R-2:** A rejection always carries a reason.
 - **R-3:** A new video or receipt clears an earlier rejection.
+- **R-4:** An approval or rejection applies only to the exact video or receipt the admin saw. If the seller uploads a new one mid-review, the decision is refused.
+- **R-5:** Rejection reasons are private. Only the seller and admins can read them.
 
 ## Data
 
 - `admins`: who is an admin. Each user can only see their own row, and no one can add rows from the apps.
-- `source_bottles.rejected_at` and `rejected_reason`, and `listings.receipt_rejected_at` and `receipt_rejected_reason`. These are set only by the review functions, and the owner can read them.
+- `review_decisions`: one row per approval or rejection (item type, item id, seller, the file path reviewed, reason, who decided and when). Written only by the review functions. RLS lets only the seller and admins read it (R-5). A rejection counts while its file path matches the current upload (R-3).
+- `source_bottles.verified_at` and `listings.receipt_verified` stay where they are, because they are meant to be public.
 - Private bottle videos and receipts can be read by their owner and by admins.
 
 ## Screens and states
