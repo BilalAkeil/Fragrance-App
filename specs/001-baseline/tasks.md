@@ -12,7 +12,7 @@ Work top to bottom. Tick each task as it lands. Before starting: PR #3 is merged
 
 ## Database
 - [x] `0005_baseline.sql`: nullable batch codes, `decant_min_size`, the capacity trigger skips unlinked decants, sold listings are public, sellers can't set `sold`, `updated_at`
-- [ ] Run it on the dev database and check the RLS cases in plan.md
+- [x] Run it on the dev database and check the RLS cases in plan.md
 
 ## Server and api
 - [x] Row types and mappers: nullable batch code, and `status`
