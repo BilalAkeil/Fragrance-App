@@ -11,6 +11,9 @@ A UK marketplace for buying and selling fragrances (full bottles, partials and d
 | `packages/core` | Shared rules used by both: fees, seller certification, decant checks, types |
 | `packages/api` | Reads listings and sellers from Supabase, or sample data when no keys are set |
 | `supabase/migrations` | Database schema |
+| `specs` | One folder per feature: spec, plan and tasks. Start from `specs/_template` |
+
+We build spec first: see `CLAUDE.md` for the workflow and the rules every change follows.
 
 ## Rules in `packages/core`
 
