@@ -1,0 +1,31 @@
+# 004: Orders and shipping — tasks
+
+Built alongside 003. Uses the `fake` shipping provider until the broker is chosen.
+
+## Core
+- [ ] `dates.ts`: the England and Wales bank holidays and `addWorkingDays`, plus tests across weekends and holidays (R-1)
+- [ ] `orders.ts`: constants, `shipByFrom`, `completeAfterFrom`, the order state machine, plus tests (R-1, R-3, R-5)
+- [ ] `shipping.ts`: `parcelFor` and `royalMailPerfumeProblems`; listing input refuses over 150ml. Tests (R-6, AC-1.2)
+
+## Database
+- [ ] `NNNN_orders_shipping.sql`: `cancelled` status, deadline columns, drop the manual tracking grant, shipments, tracking events, dispatch postcode, `transition_order`
+- [ ] Run it on the dev database and check the RLS cases in plan.md
+
+## Server and api
+- [ ] `lib/shipping/` interface and `fake` provider
+- [ ] Shipment and label on payment, plus the label download route (AC-2.1)
+- [ ] `/api/webhooks/shipping`: shipped and delivered (AC-3)
+- [ ] `/api/cron/tick`: cancel unshipped orders (refund) and complete delivered ones (payout), plus the cron config (R-2, R-4, AC-2.3, AC-4.3)
+- [ ] `confirmEverythingOk` and `setDispatchPostcode` server actions (AC-4.1)
+- [ ] `listOrders`, `getOrder` and `getQuote` in `packages/api`
+- [ ] The notifications table and `notify()` from the 010 plan, raising the order events
+- [ ] Dev-only `/admin/shipments` to step tracking
+
+## Web
+- [ ] Orders link in the header, and `/orders` with Buying and Selling tabs (AC-5.1)
+- [ ] `/orders/[id]`: timeline, label and packing guidance, countdowns, buyer actions, every status (AC-2, AC-3.3, AC-4, AC-5.2)
+- [ ] Dispatch postcode on `/account`
+
+## Check
+- [ ] `npm test` and `npm run typecheck` pass
+- [ ] End to end with Stripe test mode and the `fake` provider: buy → label → shipped → delivered → Everything's OK → transfer. Also: not shipped → cancelled and refunded, and delivered → 48 hours → auto-complete
