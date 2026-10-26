@@ -14,8 +14,9 @@ Build feature $ARGUMENTS of the fragrance marketplace, following the spec-first 
 ## 2. Make sure nobody else is building it
 
 Run `git fetch --prune`, then `gh pr list --state open --search "$ARGUMENTS in:title"`, and look for remote branches named `feature/$ARGUMENTS-*`.
-- **Someone else has an open PR or branch for this feature:** stop. Say who has it, and don't start.
-- **It's yours from an earlier session:** check it out and carry on from the first unticked task.
+- **Someone else has an open PR for this feature:** stop. Say who has it, and don't start. An open PR (draft or not) is the only thing that claims a feature.
+- **There's a branch but no open PR:** it's free to pick up. Check it out, merge the latest `main` into it, and carry on from the first unticked task in its `tasks.md`.
+- **It's your own open PR from an earlier session:** check it out and carry on from the first unticked task.
 
 ## 3. Check what the feature needs
 
@@ -27,7 +28,7 @@ If anything is missing, stop. List exactly what's missing and who can provide it
 
 ## 4. Claim it
 
-1. Create `feature/$ARGUMENTS-<short-name>` from the latest `main`.
+1. Create `feature/$ARGUMENTS-<short-name>` from the latest `main`, unless step 2 found a branch to pick up.
 2. Push it.
 3. Straight away, open a **draft** PR titled "Build $ARGUMENTS: <feature name>" that links the spec. This draft PR is how the other person knows the feature is taken.
 
