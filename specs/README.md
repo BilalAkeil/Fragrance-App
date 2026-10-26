@@ -6,18 +6,18 @@ Where a spec and the brief's "Decisions so far" table disagree, the table wins.
 
 ## The MVP specs
 
-| # | Spec | Status | Depends on |
+| # | Spec | Plan | Depends on |
 | --- | --- | --- | --- |
-| 001 | [Baseline: accounts, listings and browsing](001-baseline/spec.md) | Draft | — |
-| 002 | [Fragrance catalogue](002-catalogue/spec.md) | Draft | 001 |
-| 003 | [Checkout and payments](003-checkout/spec.md) | Draft | 001, 004, 005 |
-| 004 | [Orders and shipping](004-orders-shipping/spec.md) | Draft | 003 |
-| 005 | [ID verification, reviews and seller profiles](005-verification-reviews/spec.md) | Draft | 001, 004, 009 |
-| 006 | [Messaging](006-messaging/spec.md) | Draft | 001 |
-| 007 | [Swaps](007-swaps/spec.md) | Draft | 001–006, 008 |
-| 008 | [Disputes and refunds](008-disputes/spec.md) | Draft | 003, 004, 007, 009 |
+| 001 | [Baseline: accounts, listings and browsing](001-baseline/spec.md) | [plan](001-baseline/plan.md) · [tasks](001-baseline/tasks.md) | — |
+| 002 | [Fragrance catalogue](002-catalogue/spec.md) | [plan](002-catalogue/plan.md) · [tasks](002-catalogue/tasks.md) | 001 |
+| 003 | [Checkout and payments](003-checkout/spec.md) | [plan](003-checkout/plan.md) · [tasks](003-checkout/tasks.md) | 001, 004, 005 |
+| 004 | [Orders and shipping](004-orders-shipping/spec.md) | [plan](004-orders-shipping/plan.md) · [tasks](004-orders-shipping/tasks.md) | 003 |
+| 005 | [ID verification, reviews and seller profiles](005-verification-reviews/spec.md) | [plan](005-verification-reviews/plan.md) · [tasks](005-verification-reviews/tasks.md) | 001, 004, 009 |
+| 006 | [Messaging](006-messaging/spec.md) | [plan](006-messaging/plan.md) · [tasks](006-messaging/tasks.md) | 001 |
+| 007 | [Swaps](007-swaps/spec.md) | [plan](007-swaps/plan.md) · [tasks](007-swaps/tasks.md) | 001–006, 008 |
+| 008 | [Disputes and refunds](008-disputes/spec.md) | [plan](008-disputes/plan.md) · [tasks](008-disputes/tasks.md) | 003, 004, 007, 009 |
 | 009 | Admin console | In Bilal's PR #3 (bottle, receipt and ID review) | — |
-| 010 | [Notifications](010-notifications/spec.md) | Draft | 003–009 |
+| 010 | [Notifications](010-notifications/spec.md) | [plan](010-notifications/plan.md) · [tasks](010-notifications/tasks.md) | 003–009 |
 
 **009** starts with Bilal's admin review spec in PR #3. Once that's merged, it needs these added:
 - the dispute queue and decision form (008)
@@ -34,11 +34,13 @@ Each step can be built and released before the next one starts.
 1. **001 Baseline:** optional batch codes and source bottles, editing and removing listings, filters.
 2. **005 ID verification:** the check before listing, needed before real sellers join.
 3. **002 Catalogue:** sellers pick from it, and guide values come from it.
-4. **003 + 004 Buying:** checkout, payouts, labels, tracking and completion. These go together, because each needs the other.
+4. **003 + 004 Buying:** checkout, payouts, labels, tracking and completion. These go together, because each needs the other. The notifications table and `notify()` from 010 come in here too.
 5. **010 Notifications** for orders, then **005 Reviews** and seller profiles.
-6. **008 Disputes** and their part of **009**.
+6. **008 Disputes** and their part of **009**. 008 comes before 006, because 006's suspend action uses 008's `user_flags`.
 7. **006 Messaging.**
 8. **007 Swaps:** last, because they use everything above.
+
+Shared design for all the plans: [docs/architecture.md](../docs/architecture.md). Each plan states the answers it assumes to its spec's open questions, so the plan only needs a small change if an answer turns out different.
 
 ## Open questions in one place
 
@@ -55,6 +57,12 @@ Already settled by Bilal in PR #8: Buyer Protection is 3% + 30p (003 Q-1). A fai
 | "Swap" or "Trade" for users | Brief Q-12, 007 Q-1 | 007, copy everywhere |
 | Is launching web before the mobile app OK? | Brief Q-10 | Scope |
 | Do sellers set up payouts before their first listing or their first sale, and does Stripe's payout setup double as the ID check? | 003 Q-2, 005 Q-5 | 003, 005 |
+
+### Raised by the plans (Ben and Bilal)
+
+- **Payouts before swapping (007 plan):** cash top-ups and failed-swap compensation are paid into the other person's payout account. So swapping needs payouts set up as well as an ID check. Agree?
+- **Getting an item back after a failed swap (007 plan):** if one side never ships, the other side's item is already on its way. The plan issues a return label. Do we hold the compensation until the item is returned, or compensate for both items?
+- **Return postage (008 plan):** assumed paid by us, since every dispute reason is the seller's fault.
 
 ### Product decisions (Ben and Bilal)
 
