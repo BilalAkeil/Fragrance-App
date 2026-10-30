@@ -30,4 +30,4 @@ Work top to bottom. Tick each task as it lands. Before starting: PR #3 is merged
 
 ## Check
 - [x] `npm test` and `npm run typecheck` pass
-- [ ] Every acceptance criterion is covered by a test or checked by hand in `npm run dev:web`, with sample data and with the dev database
+- [x] Every acceptance criterion is covered by a test or checked by hand in `npm run dev:web`, with sample data and with the dev database
