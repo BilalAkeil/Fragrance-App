@@ -13,7 +13,10 @@ export async function startPayoutSetup() {
   const origin = (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   let url: string;
   try {
-    url = await onboardingLink(await payoutAccountFor(seller.id, user.email), origin);
+    url = await onboardingLink(
+      await payoutAccountFor({ id: seller.id, displayName: seller.display_name }, user.email),
+      origin,
+    );
   } catch (err) {
     console.error("Payout setup failed:", err);
     redirect("/account?payouts=error");

@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { syncPayoutsReady } from "@/lib/payouts";
-import { stripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 import { createClient } from "@/lib/supabase/server";
 
@@ -17,7 +16,7 @@ export async function GET(request: NextRequest) {
       .select("stripe_account_id")
       .eq("id", user.id)
       .maybeSingle();
-    if (seller?.stripe_account_id) await syncPayoutsReady(await stripe().accounts.retrieve(seller.stripe_account_id));
+    if (seller?.stripe_account_id) await syncPayoutsReady(seller.stripe_account_id);
   }
   return NextResponse.redirect(new URL("/account?payouts=back#payouts", request.url));
 }

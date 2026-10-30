@@ -11,10 +11,11 @@ What checkout (003), payouts and orders (004) need on your machine. Everything h
 
 ## 2. Turn on Connect (sellers get paid out through it)
 
-1. In the dashboard, open **Connect** (search "Connect" if it isn't in the sidebar) and choose **Get started**.
-2. When asked what you're building, choose **Marketplace**. Sellers are paid out with **Express** accounts, and Stripe handles their onboarding.
-3. Fill in the **platform profile** it asks for. In test mode, short answers are fine. Stripe won't create seller accounts until it's done.
-4. Under **Settings > Connect > Branding**, set a business name ("Fragrance Marketplace"), a brand colour (`#1f5fa8`) and an icon. Express onboarding shows these to sellers, and Stripe asks for them before it will start onboarding.
+1. **Switch Connect on.** In a sandbox, the Stripe plugin or CLI can do it (`EnableConnect`), or use **Connect > Get started** in the dashboard.
+2. **Accept loss liability** under **Settings > Connect > Platform profile** (https://dashboard.stripe.com/settings/connect/platform-profile). We hold the buyer's money and pay sellers later (separate charges and transfers), so Stripe requires the platform, not Stripe, to cover any negative balance on a seller's account. Until this is done, Stripe refuses to create seller accounts with "account_creation_losses_collector_unavailable".
+3. **Set the branding** under **Settings > Connect > Branding**: a business name ("Fragrance Marketplace"), a brand colour (`#1f5fa8`) and an icon. Stripe's onboarding shows these to sellers.
+
+Sellers are Accounts v2 "recipient" accounts with the Express Dashboard (`lib/payouts.ts`). Stripe no longer lets new platforms create the older Express account type.
 
 ## 3. Copy the API keys into `apps/web/.env.local`
 
@@ -40,7 +41,13 @@ stripe login
 Then, whenever you're testing checkout, run this in its own terminal while `npm run dev:web` is running:
 
 ```bash
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
+stripe listen --forward-to localhost:3000/api/webhooks/stripe --events checkout.session.completed,checkout.session.expired,checkout.session.async_payment_succeeded
+```
+
+Seller account changes arrive as v2 events, which need their own forwarding. Run this too, in another terminal:
+
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe/accounts --events 'v2.core.account[configuration.recipient].capability_status_updated,v2.core.account[requirements].updated'
 ```
 
 The first time, it prints a webhook signing secret starting `whsec_`. Add it to `apps/web/.env.local` as `STRIPE_WEBHOOK_SECRET=whsec_...`. It stays the same for your machine, so you only do this once. Each of us has our own.

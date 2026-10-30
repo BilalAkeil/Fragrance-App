@@ -11,8 +11,8 @@ import { getCurrentSeller } from "@/lib/supabase/server";
 import { RemoveListingButton } from "../listings/[id]/RemoveListingButton";
 import { createSellerProfile, setDispatchPostcode, signOut } from "./actions";
 import { startPayoutSetup } from "./payouts/actions";
-import { PAYOUT_STATUS_TEXT, payoutStatus, type PayoutStatus } from "@/lib/payouts";
-import { stripe, stripeConfigured } from "@/lib/stripe";
+import { PAYOUT_STATUS_TEXT, payoutStatus, retrievePayoutAccount, type PayoutStatus } from "@/lib/payouts";
+import { stripeConfigured } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 
 const ERRORS: Record<string, string> = {
@@ -72,7 +72,7 @@ export default async function AccountPage({
     ]);
     dispatchPostcode = settings?.dispatch_postcode ?? null;
     if (account?.stripe_account_id && stripeConfigured) {
-      payoutState = payoutStatus(await stripe().accounts.retrieve(account.stripe_account_id).catch(() => undefined));
+      payoutState = payoutStatus(await retrievePayoutAccount(account.stripe_account_id).catch(() => undefined));
     }
   }
 
@@ -136,7 +136,7 @@ export default async function AccountPage({
               </span>{" "}
               <span className="text-muted">{PAYOUT_STATUS_TEXT[payoutState]}</span>
             </p>
-            {payouts === "error" && <p className="text-sm text-danger">We couldn&apos;t reach Stripe. Please try again.</p>}
+            {payouts === "error" && <p className="text-sm text-danger">Stripe couldn&apos;t start payout setup. Please try again in a few minutes.</p>}
             {payoutState !== "ready" &&
               (stripeConfigured ? (
                 <form action={startPayoutSetup}>

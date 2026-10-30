@@ -1,12 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
 import { createOrderFromCheckout, releaseReservation, type CheckoutMetadata } from "@/lib/orders";
-import { syncPayoutsReady } from "@/lib/payouts";
 import { stripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 
-// Stripe's webhooks (architecture: one route, signature checked, each event
-// handled once). Locally, `stripe listen --forward-to localhost:3000/api/webhooks/stripe`.
+// Stripe's payment webhooks (architecture: signature checked, each event
+// handled once). Seller account changes are v2 events, on ./accounts.
+// Locally: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`.
 export async function POST(request: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = request.headers.get("stripe-signature");
@@ -36,9 +36,6 @@ export async function POST(request: NextRequest) {
         if (md?.listingId) await releaseReservation(md.listingId, md.buyerId);
         break;
       }
-      case "account.updated":
-        await syncPayoutsReady(event.data.object);
-        break;
     }
   } catch (err) {
     // Forget the event so Stripe's retry gets handled.
