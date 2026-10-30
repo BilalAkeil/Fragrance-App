@@ -51,9 +51,9 @@ A UK marketplace where fragrance fans **buy, sell and swap** full bottles, parti
 - **Refunds only through Buyer Protection**, when an item:
   - never arrives (lost in the post): full refund;
   - arrives damaged, or significantly not as described: the buyer posts it back, and is refunded once the seller receives it;
-  - is fake: full refund, and the seller gets a strike (see Trust model).
+  - is fake: full refund without sending it back, and the seller gets a strike (see Trust model).
 - **48-hour window.** The buyer reports the problem within 48 hours of delivery or collection. Tapping "Everything's OK", or letting the 48 hours pass, completes the order and ends protection.
-- **Return postage** is paid by the buyer, as on Vinted. Who pays for returning a fake is still open (Q-14).
+- **Return postage** is paid by the buyer, as on Vinted, unless the seller offers to. A fake isn't sent back (Q-14).
 - **A full refund covers** the item, the postage and the Buyer Protection fee.
 - **Disputes:** if the buyer and seller can't agree, an admin looks at the evidence (photos, messages, tracking) and decides.
 
@@ -155,25 +155,25 @@ Mobile apps (see Q-10), price offers, auctions, wishlists and alerts, shipping o
 
 ## Open questions
 
-These need answers before the specs that depend on them are agreed.
+These need answers before the specs that depend on them are agreed. On 2026-10-30, the ones Vinted or UK law can answer were settled with Ben's rule: copy Vinted, and comply with UK law. The rest are business calls.
 
 - [ ] **Q-1 Name and brand:** what's the working name? Any logo or colours to start the design system from?
   - [x] **Colours:** light blue (Bilal, 2026-10-26), already on the website.
-  - [ ] **Name and logo:** Bilal is choosing from a shortlist.
+  - [ ] **Name and logo:** Bilal is choosing from a shortlist. Still open: a brand call.
 - [ ] **Q-2 Fee levels:** what are the final Buyer Protection and Swap Protection fees?
   - [x] **Buyer Protection:** 3% + 30p (Bilal, 2026-10-26), the lowest level that still covers card costs with a small buffer for refunds.
-  - [ ] **Swap Protection:** not set yet.
+  - [ ] **Swap Protection:** not set yet. Still open: a fee call for Bilal.
 - [x] **Q-3 Swap deadline:** 5 working days, as Vinted does. Bilal to confirm: the design still shows "[N] working days".
-- [ ] **Q-4 Card hold limits:** a standard Stripe card hold expires after 7 days. A swap is 5 working days to ship, plus delivery, plus the 2-day check, so it will usually run past that. Options: take the payment up front and refund it on completion; use Stripe's extended authorisations where the card is eligible; or re-authorise near expiry. To settle in 007's plan, but it changes the wording users see ("hold" vs "deposit, refunded").
+- [ ] **Q-4 Card hold limits:** a standard Stripe card hold expires after 7 days. A swap is 5 working days to ship, plus delivery, plus the 2-day check, so it will usually run past that. Options: take the payment up front and refund it on completion; use Stripe's extended authorisations where the card is eligible; or re-authorise near expiry. To settle in 007's plan, but it changes the wording users see ("hold" vs "deposit, refunded"). Still open: a Stripe and cost call, and Vinted has no swaps to copy.
 - [x] **Q-5 Hold value:** the catalogue guide price.
-  - [ ] **Q-5a:** where do the guide prices come from, and how often are they updated? Options: we set them by hand, or derive them from recent sales on the platform with a manual starting value.
+  - [ ] **Q-5a:** where do the guide prices come from, and how often are they updated? Options: we set them by hand, or derive them from recent sales on the platform with a manual starting value. Still open: Vinted has no guide prices (002 Q-2).
 - [x] **Q-6 Shipping labels:** prepaid labels, Vinted-style.
-  - [ ] **Q-6a:** which shipping broker? The buyer picks the service and postage is quoted live (Bilal), so we need a broker that covers several UK carriers and returns live prices, labels and tracking. Sendcloud or Packlink.
-- [ ] **Q-7 Postage rules:** Royal Mail treats perfume as a flammable liquid with volume limits, and other carriers have their own rules. Which services and bottle sizes do we allow? This depends on Q-6a.
-- [ ] **Q-8 Certification:** how many reviews before the 4★ rule applies? (5 is a placeholder.) Do swaps count towards reviews?
+  - [ ] **Q-6a:** which shipping broker? The buyer picks the service and postage is quoted live (Bilal), so we need a broker that covers several UK carriers and returns live prices, labels and tracking. Sendcloud or Packlink. Still open: a supplier call (004 Q-1).
+- [x] **Q-7 Postage rules:** Royal Mail treats perfume as a flammable liquid with volume limits, and other carriers have their own rules. Which services and bottle sizes do we allow? **Royal Mail Tracked 24 and 48, at most 150ml per bottle; bigger bottles can't be listed** (004 Q-2 and Q-6). Royal Mail's May 2025 list says at most 4 per parcel and counter hand-in, and limits perfume on Tracked services, so confirm with Royal Mail before launch (004).
+- [x] **Q-8 Certification:** how many reviews before the 4★ rule applies? Do swaps count towards reviews? **5, and yes** (005 Q-1 and Q-2, PR #14).
 - [x] **Q-9 Who can sell or swap:** ID is verified before anyone can list or swap. Buying needs no ID check.
-- [ ] **Q-10 Mobile timing:** Bilal wants a website and an app, and the product plan has them launching together. This brief puts the app after the web MVP. Is launching web first OK?
+- [ ] **Q-10 Mobile timing:** Bilal wants a website and an app, and the product plan has them launching together. This brief puts the app after the web MVP. Is launching web first OK? Still open: a timing call for Bilal.
 - [x] **Q-11 What a failed swap costs:** the side at fault is charged the full resale value of the item they promised, which goes to the other person as compensation. The other person's cash top-up and fee are refunded too (Bilal, 2026-10-26). The Trade design's copy needs updating to match. How we collect it depends on Q-4.
 - [x] **Q-13 Proven fakes:** a warning each time, and a ban after more than 3 (so on the 4th). Bilal, 2026-10-26.
-- [ ] **Q-14 Returning a fake:** does the buyer post a fake back at the seller's cost, at ours, or not at all (for example, keep it as evidence or destroy it)?
-- [ ] **Q-12 Swap or Trade:** this brief says "swap", the design and website say "Trade". Pick one word for users.
+- [x] **Q-14 Returning a fake:** does the buyer post a fake back at the seller's cost, at ours, or not at all? **Not at all.** With strong evidence, the buyer is refunded in full and keeps it, as on Vinted ([Vinted: item seems to be counterfeit](https://www.vinted.co.uk/help/1471)). With weak evidence, it's treated as "not as described" and returned (008 Q-2).
+- [ ] **Q-12 Swap or Trade:** this brief says "swap", the design and website say "Trade". Pick one word for users. Still open: a naming call, and Vinted has no swaps to copy (007 Q-1).

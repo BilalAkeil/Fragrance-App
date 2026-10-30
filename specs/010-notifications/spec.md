@@ -71,5 +71,7 @@ Almost every step in an order or swap has a deadline: 5 working days to ship, 48
 
 ## Open questions
 
-- [ ] **Q-1:** Which email provider? A plan decision, but it needs a sending domain, which depends on the product name (brief Q-1).
-- [ ] **Q-2:** Should the in-app list be in the MVP, or email only at first?
+Settled on 2026-10-30 with Ben's rule: copy Vinted, and comply with UK law (law wins where they clash). Questions still open say why.
+
+- [ ] **Q-1:** Which email provider? A plan decision, but it needs a sending domain, which depends on the product name (brief Q-1). **Still open:** a supplier and cost call, waiting on the name.
+- [x] **Q-2:** Should the in-app list be in the MVP? **Yes.** Vinted shows notifications in the app as well as by email. AC-1.2 stands.

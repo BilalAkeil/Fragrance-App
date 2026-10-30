@@ -57,7 +57,7 @@ Buyers ask questions before they buy ("Can you send a photo of the batch code?")
 - **R-2:** You can't start a thread on your own listing. Sellers reply in threads that buyers start.
 - **R-3:** Photos in messages are private to the thread.
 - **R-4:** Sending is rate-limited, for example 20 new threads a day per user, to stop spam.
-- **R-5:** Messages are kept for at least as long as a dispute could be raised on the related order or swap.
+- **R-5:** Messages and their photos are deleted 12 months after the thread's last message (Q-2). Threads linked to an open report, dispute or appeal are kept until it's closed.
 
 ## Data
 
@@ -81,6 +81,8 @@ Buyers ask questions before they buy ("Can you send a photo of the batch code?")
 
 ## Open questions
 
-- [ ] **Q-1:** Should messages with contact details or payment links be warned about (as written) or blocked outright?
-- [ ] **Q-2:** How long do we keep messages, and photos, after the related order or swap ends?
-- [ ] **Q-3:** Can anyone message, or only people with a verified ID? Verification is needed to list or swap, not to buy (005).
+Settled on 2026-10-30 with Ben's rule: copy Vinted, and comply with UK law (law wins where they clash). Questions still open say why.
+
+- [x] **Q-1:** Warn about contact details and payment links, or block them? **Warn, as written.** Vinted's community standards tell members not to share phone numbers or bank details, and to report anyone who asks. They don't say Vinted blocks these messages ([Vinted: community standards](https://www.vinted.co.uk/help/349)).
+- [x] **Q-2:** How long do we keep messages and photos? **12 months after the thread's last message, or longer while a report, dispute or appeal is open.** Vinted's privacy policy (the version in force until September 2025) deleted messages after 12 months. UK GDPR's storage limitation principle means we keep them no longer than needed. R-5 updated.
+- [x] **Q-3:** Can anyone message, or only people with a verified ID? **Anyone signed in.** Any Vinted member can message a seller, and buying needs no ID check (005).
