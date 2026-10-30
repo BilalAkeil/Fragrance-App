@@ -4,8 +4,8 @@
 - [x] `catalogue.ts`: `Concentration`, `normaliseName`, `guidePricePerMl`, `guideValuePence`, plus tests for full, partial, decant and no-price cases (R-3, R-4, AC-4)
 
 ## Database
-- [ ] `NNNN_catalogue.sql`: pg_trgm; houses, fragrances, sizes, price-change history and its trigger; `fragrance_id` on listings and bottles; RLS; `admin_merge_fragrance`
-- [ ] Run it on the dev database and check the RLS cases in plan.md
+- [x] `0006_catalogue.sql`: pg_trgm; houses, fragrances, sizes, price-change history and its trigger; `fragrance_id` on listings and bottles; RLS; `admin_merge_fragrance`
+- [x] Run it on the dev database and check the RLS cases in plan.md (plus `0007_catalogue_security.sql` and `0008_catalogue_accents.sql`, fixes after it ran)
 
 ## Server and api
 - [ ] `/api/catalogue/search` route
