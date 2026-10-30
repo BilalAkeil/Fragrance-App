@@ -8,7 +8,14 @@ describe("row mapping", () => {
         { id: "s1", display_name: "ScentShelf", id_verified: true },
         { seller_id: "s1", review_count: 7, average_rating: "4.29" },
       ),
-    ).toEqual({ id: "s1", displayName: "ScentShelf", idVerified: true, reviewCount: 7, averageRating: 4.29 });
+    ).toEqual({
+      id: "s1",
+      displayName: "ScentShelf",
+      idVerified: true,
+      reviewCount: 7,
+      averageRating: 4.29,
+      payoutsReady: false,
+    });
   });
 
   it("treats a seller with no reviews as zero", () => {
@@ -113,5 +120,50 @@ describe("row mapping", () => {
       listingCount: 2,
       updatedAt: "2026-10-30",
     });
+  });
+});
+
+describe("order mapping", () => {
+  it("maps an order with its item, tracking in time order, and first photo", async () => {
+    const { toOrder } = await import("./orders");
+    const order = toOrder({
+      id: "o1",
+      listing_id: "l1",
+      buyer_id: "b1",
+      seller_id: "s1",
+      status: "shipped",
+      item_pence: 8200,
+      postage_pence: 335,
+      protection_fee_pence: 276,
+      delivery_service: "tracked48",
+      ship_to: { name: "B", line1: "1 Test St", town: "Leeds", postcode: "LS1 1AA" },
+      created_at: "2026-11-02T10:00:00Z",
+      ship_by: "2026-11-09T23:59:59Z",
+      shipped_at: "2026-11-03T09:00:00Z",
+      delivered_at: null,
+      complete_after: null,
+      completed_at: null,
+      cancelled_at: null,
+      listings: {
+        house: "Dior",
+        name: "Sauvage Eau de Parfum",
+        kind: "full",
+        size_ml: 100,
+        listing_photos: [
+          { path: "b.jpg", position: 1 },
+          { path: "a.jpg", position: 0 },
+        ],
+      },
+      shipments: {
+        tracking_ref: "FK1",
+        tracking_events: [
+          { at: "2026-11-03T12:00:00Z", status: "in_transit", description: "In transit" },
+          { at: "2026-11-03T09:00:00Z", status: "scanned", description: "Accepted" },
+        ],
+      },
+    });
+    expect(order.item).toEqual({ house: "Dior", name: "Sauvage Eau de Parfum", kind: "full", sizeMl: 100, photo: "a.jpg" });
+    expect(order.tracking.map((t) => t.status)).toEqual(["scanned", "in_transit"]);
+    expect(order).toMatchObject({ status: "shipped", trackingRef: "FK1", shipBy: "2026-11-09T23:59:59Z", deliveredAt: undefined });
   });
 });

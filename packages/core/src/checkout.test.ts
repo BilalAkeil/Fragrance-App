@@ -33,8 +33,8 @@ describe("canBuy", () => {
 });
 
 describe("reservationEndsAt", () => {
-  it("is 30 minutes away", () => {
-    expect(reservationEndsAt(now).toISOString()).toBe("2026-11-02T12:30:00.000Z");
+  it("is 31 minutes away, Stripe's 30-minute minimum plus a minute to create the session", () => {
+    expect(reservationEndsAt(now).toISOString()).toBe("2026-11-02T12:31:00.000Z");
   });
 });
 

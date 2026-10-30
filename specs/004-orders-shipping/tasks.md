@@ -12,19 +12,19 @@ Built alongside 003. Uses the `fake` shipping provider until the broker is chose
 - [x] Run it on the dev database and check the RLS cases in plan.md
 
 ## Server and api
-- [ ] `lib/shipping/` interface and `fake` provider
-- [ ] Shipment and label on payment, plus the label download route (AC-2.1)
-- [ ] `/api/webhooks/shipping`: shipped and delivered (AC-3)
+- [x] `lib/shipping/` interface and `fake` provider
+- [x] Shipment and label on payment, plus the label download route (AC-2.1)
+- [x] `/api/webhooks/shipping`: shipped and delivered (AC-3)
 - [ ] `/api/cron/tick`: cancel unshipped orders (refund) and complete delivered ones (payout), plus the cron config (R-2, R-4, AC-2.3, AC-4.3)
-- [ ] `confirmEverythingOk` and `setDispatchPostcode` server actions (AC-4.1)
-- [ ] `listOrders`, `getOrder` and `getQuote` in `packages/api`
-- [ ] The notifications table and `notify()` from the 010 plan, raising the order events
-- [ ] Dev-only `/admin/shipments` to step tracking
+- [x] `confirmEverythingOk` and `setDispatchPostcode` server actions (AC-4.1)
+- [x] `listOrders`, `getOrder` and `getQuote` in `packages/api`
+- [x] The notifications table and `notify()` from the 010 plan, raising the order events
+- [x] Dev-only `/admin/shipments` to step tracking
 
 ## Web
-- [ ] Orders link in the header, and `/orders` with Buying and Selling tabs (AC-5.1)
-- [ ] `/orders/[id]`: timeline, label and packing guidance, countdowns, buyer actions, every status (AC-2, AC-3.3, AC-4, AC-5.2)
-- [ ] Dispatch postcode on `/account`
+- [x] Orders link in the header, and `/orders` with Buying and Selling tabs (AC-5.1)
+- [x] `/orders/[id]`: timeline, label and packing guidance, countdowns, buyer actions, every status (AC-2, AC-3.3, AC-4, AC-5.2)
+- [x] Dispatch postcode on `/account`
 
 ## Check
 - [ ] `npm test` and `npm run typecheck` pass

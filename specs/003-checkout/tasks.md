@@ -11,18 +11,18 @@ Built alongside 004. Needs Stripe test keys and the service-role key on this mac
 - [x] Run it on the dev database and check the RLS cases in plan.md
 
 ## Server and api
-- [ ] `lib/supabase/service.ts` (server-only) and `lib/stripe.ts`
-- [ ] `startCheckout` server action (AC-1.2 to AC-1.4)
-- [ ] `/api/webhooks/stripe` with stored event ids: session completed (order, sold, label, refund of a duplicate), session expired, `account.updated` (AC-1.5, AC-2.2, AC-3.1)
-- [ ] `startPayoutSetup`, plus the return and refresh routes (AC-3.1)
-- [ ] `transferToSeller` and `refundOrder` helpers (AC-3.2)
-- [ ] `getAddresses` and `getCheckoutSummary` in `packages/api`
+- [x] `lib/supabase/service.ts` (server-only) and `lib/stripe.ts`
+- [x] `startCheckout` server action (AC-1.2 to AC-1.4)
+- [x] `/api/webhooks/stripe` with stored event ids: session completed (order, sold, label, refund of a duplicate), session expired, `account.updated` (AC-1.5, AC-2.2, AC-3.1)
+- [x] `startPayoutSetup`, plus the return and refresh routes (AC-3.1)
+- [x] `transferToSeller` and `refundOrder` helpers (AC-3.2)
+- [x] `getAddresses` and `getCheckoutSummary` in `packages/api`
 
 ## Web
-- [ ] Buy now states on the listing page: sign in, payouts not ready, reserved (AC-1.1, AC-2.1)
-- [ ] `/checkout/[listingId]`: address, delivery, summary, embedded Checkout (AC-1.2 to AC-1.4, AC-4.1)
-- [ ] `/checkout/return`: the confirmation and failure states (AC-1.5, AC-1.6)
-- [ ] The Payouts section on `/account` (AC-3.1)
+- [x] Buy now states on the listing page: sign in, payouts not ready, reserved (AC-1.1, AC-2.1)
+- [x] `/checkout/[listingId]`: address, delivery, summary, embedded Checkout (AC-1.2 to AC-1.4, AC-4.1)
+- [x] `/checkout/return`: the confirmation and failure states (AC-1.5, AC-1.6)
+- [x] The Payouts section on `/account` (AC-3.1)
 
 ## Check
 - [ ] `npm test` and `npm run typecheck` pass

@@ -40,6 +40,9 @@ export default function RootLayout({
               <Link href="/#listings" className="inline-flex min-h-11 items-center rounded-full px-3.5 hover:bg-white">
                 Browse
               </Link>
+              <Link href="/orders" className="inline-flex min-h-11 items-center rounded-full px-3.5 hover:bg-white">
+                Orders
+              </Link>
               <Link href="/account" className="inline-flex min-h-11 items-center rounded-full px-3.5 hover:bg-white">
                 Account
               </Link>

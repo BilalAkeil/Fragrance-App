@@ -1,4 +1,6 @@
 import { addWorkingDays, endOfUkDay } from "./dates";
+import type { DeliveryService } from "./shipping";
+import type { ListingKind } from "./types";
 
 // Orders after payment (spec 004): deadlines and the order state machine.
 
@@ -69,4 +71,67 @@ export function timeLeft(deadline: Date, now: Date): string {
   if (hours < 48) return `${hours} ${hours === 1 ? "hour" : "hours"} left`;
   const days = Math.floor(hours / 24);
   return `${days} days left`;
+}
+
+export interface ShipToAddress {
+  name: string;
+  line1: string;
+  line2?: string;
+  town: string;
+  postcode: string;
+}
+
+export interface TrackingEvent {
+  at: string;
+  status: "scanned" | "in_transit" | "delivered" | "exception";
+  description: string;
+}
+
+export interface Order {
+  id: string;
+  listingId: string;
+  // What was bought, as it was listed.
+  item: { house: string; name: string; kind: ListingKind; sizeMl: number; photo?: string };
+  buyerId: string;
+  sellerId: string;
+  status: OrderStatus;
+  itemPence: number;
+  postagePence: number;
+  protectionFeePence: number;
+  deliveryService?: DeliveryService;
+  // Only the buyer, the seller and admins can read it.
+  shipTo?: ShipToAddress;
+  trackingRef?: string;
+  tracking: TrackingEvent[];
+  createdAt: string;
+  shipBy?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
+  completeAfter?: string;
+  completedAt?: string;
+  cancelledAt?: string;
+}
+
+// AC-5.1: what happens next on an order, from one side's point of view.
+export function nextStep(order: Pick<Order, "status" | "shipBy" | "completeAfter">, role: "buyer" | "seller") {
+  switch (order.status) {
+    case "paid":
+      return role === "seller"
+        ? { text: "Send it", deadline: order.shipBy }
+        : { text: "Waiting for the seller to send it", deadline: order.shipBy };
+    case "shipped":
+      return { text: "On its way" };
+    case "delivered":
+      return role === "buyer"
+        ? { text: "Check it and confirm", deadline: order.completeAfter }
+        : { text: "Delivered. Waiting for the buyer", deadline: order.completeAfter };
+    case "disputed":
+      return { text: "Problem reported" };
+    case "completed":
+      return { text: "Completed" };
+    case "refunded":
+      return { text: "Refunded" };
+    case "cancelled":
+      return { text: "Cancelled and refunded" };
+  }
 }

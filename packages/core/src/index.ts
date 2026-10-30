@@ -9,4 +9,5 @@ export * from "./dates";
 export * from "./orders";
 export * from "./shipping";
 export * from "./checkout";
+export * from "./notifications";
 export * from "./sample-data";

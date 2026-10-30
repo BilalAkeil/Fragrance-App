@@ -6,6 +6,7 @@ export interface SellerRow {
   id: string;
   display_name: string;
   id_verified: boolean;
+  payouts_ready?: boolean;
 }
 
 export interface SellerRatingRow {
@@ -43,6 +44,8 @@ export interface ListingRow {
   source_bottle_id: string | null;
   notes: string[];
   status: Listing["status"];
+  reserved_by?: string | null;
+  reserved_until?: string | null;
   fragrance_id?: string | null;
   // Embedded through fragrance_id, for the house filter.
   fragrances?: { house_id: string } | null;
@@ -77,6 +80,7 @@ export function toSeller(row: SellerRow, rating?: SellerRatingRow): Seller {
     id: row.id,
     displayName: row.display_name,
     idVerified: row.id_verified,
+    payoutsReady: row.payouts_ready ?? false,
     reviewCount: rating ? Number(rating.review_count) : 0,
     averageRating: rating?.average_rating != null ? Number(rating.average_rating) : 0,
   };
@@ -145,5 +149,7 @@ export function toListing(row: ListingRow, photoUrl: (path: string) => string = 
       .map((p) => photoUrl(p.path)),
     notes: row.notes,
     status: row.status,
+    reservedBy: row.reserved_by ?? undefined,
+    reservedUntil: row.reserved_until ?? undefined,
   };
 }

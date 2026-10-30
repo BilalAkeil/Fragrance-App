@@ -36,6 +36,7 @@ import {
 } from "./rows";
 
 export * from "./rows";
+export * from "./orders";
 
 export interface Marketplace {
   // False when no Supabase keys are set and sample data is being shown.
@@ -81,7 +82,7 @@ export function createMarketplace(config: {
 }
 
 const LISTING_FIELDS =
-  "id, seller_id, house, name, kind, size_ml, fill_percent, condition, batch_code, price_pence, postage_pence, receipt_verified, source_bottle_id, fragrance_id, notes, status, listing_photos(path, position)";
+  "id, seller_id, house, name, kind, size_ml, fill_percent, condition, batch_code, price_pence, postage_pence, receipt_verified, source_bottle_id, fragrance_id, notes, status, reserved_by, reserved_until, listing_photos(path, position)";
 const LISTING_COLUMNS = `${LISTING_FIELDS}, fragrances(house_id)`;
 // An inner join, so only listings matched to a fragrance come back.
 const LISTING_COLUMNS_BY_HOUSE = `${LISTING_FIELDS}, fragrances!inner(house_id)`;
@@ -134,7 +135,7 @@ export function supabaseMarketplace(client: SupabaseClient): Marketplace {
     async getSellers(ids) {
       if (ids.length === 0) return [];
       const [sellers, ratings] = await Promise.all([
-        client.from("sellers").select("id, display_name, id_verified").in("id", ids),
+        client.from("sellers").select("id, display_name, id_verified, payouts_ready").in("id", ids),
         client.from("seller_ratings").select("seller_id, review_count, average_rating").in("seller_id", ids),
       ]);
       if (sellers.error) throw sellers.error;

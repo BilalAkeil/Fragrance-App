@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { batchCodeLabel, checkoutBreakdown, formatGBP, hasVerifiedSource } from "@fragrance/core";
+import { batchCodeLabel, checkoutBreakdown, formatGBP, hasVerifiedSource, parcelFor } from "@fragrance/core";
 import { BottleTile } from "@/components/BottleTile";
 import { CONDITION_LABELS, KIND_LABELS } from "@/components/labels";
 import { SellerBadge } from "@/components/SellerBadge";
-import { buttonPrimary, panel } from "@/components/ui";
+import { panel } from "@/components/ui";
 import { marketplace } from "@/lib/marketplace";
+import { shippingProvider } from "@/lib/shipping";
+import { BuyButton } from "./BuyButton";
 import { OwnerActions } from "./OwnerActions";
 
 export const revalidate = 60;
@@ -19,7 +21,9 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
     marketplace.getSellers([listing.sellerId]),
     listing.sourceBottleId ? marketplace.getSourceBottle(listing.sourceBottleId) : undefined,
   ]);
-  const price = checkoutBreakdown(listing.pricePence, listing.postagePence);
+  // Postage is chosen at checkout (004 AC-1.1), so the page shows the cheapest.
+  const quotes = await shippingProvider().quote(parcelFor([listing]), undefined, "");
+  const price = checkoutBreakdown(listing.pricePence, Math.min(...quotes.map((q) => q.pricePence)));
   const title = `${listing.house} ${listing.name}`;
   const verifiedSource = hasVerifiedSource(listing, bottle);
   const available = listing.status === "active";
@@ -74,16 +78,14 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
           <div className={`${panel} flex flex-col gap-3.5`}>
             <p className="text-3xl font-extrabold tracking-tight">{formatGBP(price.itemPence)}</p>
             <dl className="flex flex-col gap-2 text-[15px]">
-              <Row label="Postage (tracked)" value={formatGBP(price.postagePence)} />
+              <Row label="Royal Mail tracked postage" value={`from ${formatGBP(price.postagePence)}`} />
               <Row label="Buyer Protection" value={formatGBP(price.protectionFeePence)} />
               <div className="border-t border-line pt-3">
-                <Row label="Total" value={formatGBP(price.buyerTotalPence)} bold />
+                <Row label="Total" value={`from ${formatGBP(price.buyerTotalPence)}`} bold />
               </div>
             </dl>
             {available ? (
-              <button disabled className={`${buttonPrimary} w-full`}>
-                Buy now (checkout coming soon)
-              </button>
+              <BuyButton listing={listing} sellerPayoutsReady={seller.payoutsReady} />
             ) : (
               <p className="rounded-xl bg-neutral-tint px-4 py-3 text-center font-bold text-neutral-ink">
                 {listing.status === "sold" ? "Sold" : "No longer available"}

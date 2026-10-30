@@ -8,6 +8,7 @@ const seller = (overrides: Partial<Seller>): Seller => ({
   idVerified: true,
   reviewCount: 10,
   averageRating: 4.5,
+  payoutsReady: true,
   ...overrides,
 });
 

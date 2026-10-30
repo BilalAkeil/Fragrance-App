@@ -3,9 +3,10 @@ import type { Listing } from "./types";
 
 // Buying a listing (spec 003).
 
-// Plan Q-3: a Stripe Checkout Session can't expire sooner than 30 minutes, so
-// a reservation lasts that long.
-export const RESERVATION_MINUTES = 30;
+// Plan Q-3: a Stripe Checkout Session can't expire sooner than 30 minutes, and
+// it expires with the reservation. The extra minute covers the time it takes
+// to create the session after reserving.
+export const RESERVATION_MINUTES = 31;
 
 export function reservationEndsAt(now: Date): Date {
   return new Date(now.getTime() + RESERVATION_MINUTES * 60_000);
