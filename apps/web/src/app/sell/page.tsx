@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { NotConnected } from "@/components/NotConnected";
+import { bottleOptions, loadOwnBottles } from "@/lib/bottles";
 import { supabaseConfigured } from "@/lib/supabase/config";
 import { getCurrentSeller } from "@/lib/supabase/server";
-import { SellForm } from "./SellForm";
+import { ListingForm } from "./ListingForm";
 
 export default async function SellPage() {
   if (!supabaseConfigured) return <NotConnected />;
@@ -11,11 +12,7 @@ export default async function SellPage() {
   if (!user) redirect("/login");
   if (!seller) redirect("/account");
 
-  const { data: bottles } = await supabase
-    .from("source_bottles")
-    .select("id, house, name, size_ml")
-    .eq("seller_id", user.id)
-    .not("verified_at", "is", null);
+  const bottles = await loadOwnBottles(supabase, user.id);
 
   return (
     <>
@@ -23,10 +20,7 @@ export default async function SellPage() {
       <p className="mb-8 text-muted">
         Selling is free. <Link href="/account" className="font-bold text-brand underline">Back to your account</Link>
       </p>
-      <SellForm
-        userId={user.id}
-        bottles={(bottles ?? []).map((b) => ({ id: b.id, label: `${b.house} ${b.name}, ${b.size_ml}ml` }))}
-      />
+      <ListingForm userId={user.id} bottles={bottleOptions(bottles)} />
     </>
   );
 }

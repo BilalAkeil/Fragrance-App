@@ -35,6 +35,7 @@ describe("row mapping", () => {
         receipt_verified: true,
         source_bottle_id: null,
         notes: ["Pepper"],
+        status: "active",
         listing_photos: [
           { path: "b.jpg", position: 1 },
           { path: "a.jpg", position: 0 },
@@ -43,7 +44,32 @@ describe("row mapping", () => {
       (p) => `https://cdn/${p}`,
     );
     expect(listing.photos).toEqual(["https://cdn/a.jpg", "https://cdn/b.jpg"]);
+    expect(listing.status).toBe("active");
+    expect(listing.batchCode).toBe("3J01");
     expect(listing.fillPercent).toBeUndefined();
     expect(listing.sourceBottleId).toBeUndefined();
+  });
+
+  it("maps a missing batch code to undefined", () => {
+    const listing = toListing({
+      id: "l2",
+      seller_id: "s1",
+      house: "Creed",
+      name: "Aventus",
+      kind: "decant",
+      size_ml: 10,
+      fill_percent: null,
+      condition: "new_unsealed",
+      batch_code: null,
+      price_pence: 2800,
+      postage_pence: 175,
+      receipt_verified: false,
+      source_bottle_id: null,
+      notes: [],
+      status: "sold",
+    });
+    expect(listing.batchCode).toBeUndefined();
+    expect(listing.sourceBottleId).toBeUndefined();
+    expect(listing.status).toBe("sold");
   });
 });

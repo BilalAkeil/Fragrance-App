@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { listingFilterFromParams } from "@fragrance/core";
 import { ListingBrowser } from "@/components/ListingBrowser";
 import { SampleDataNotice } from "@/components/SampleDataNotice";
 import { buttonPrimary, buttonSecondary } from "@/components/ui";
@@ -19,8 +20,8 @@ const REASONS = [
     tone: "text-verified-ink",
   },
   {
-    title: "Decants traced to a real bottle",
-    text: "Every decant links to a filmed source bottle with its batch code. 5ml minimum, always labelled.",
+    title: "Decants you can trace",
+    text: "Look for the Verified source badge: the decant comes from a bottle we have seen on video. 5ml minimum, always labelled.",
     icon: (
       <>
         <rect x="3" y="6" width="13" height="12" rx="2" />
@@ -51,9 +52,17 @@ const STEPS = [
   ],
 ];
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { q } = await searchParams;
-  const listings = await marketplace.listListings();
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const filter = listingFilterFromParams(
+    Object.fromEntries(Object.entries(params).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v])),
+  );
+  const q = filter.query;
+  const listings = await marketplace.listListings(filter);
   const sellers = await marketplace.getSellers([...new Set(listings.map((l) => l.sellerId))]);
 
   return (
@@ -110,7 +119,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
       <section id="listings" className="flex scroll-mt-6 flex-col gap-5">
         <h2 className="text-2xl font-extrabold tracking-tight">{q ? `Results for “${q}”` : "Just listed"}</h2>
         {!marketplace.live && <SampleDataNotice />}
-        <ListingBrowser key={q ?? ""} listings={listings} sellers={sellers} initialQuery={q ?? ""} />
+        <ListingBrowser listings={listings} sellers={sellers} filter={filter} />
       </section>
 
       <section className="flex flex-col gap-6">

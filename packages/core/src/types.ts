@@ -4,6 +4,9 @@ export type ListingKind = "full" | "partial" | "decant";
 
 export type Condition = "new_sealed" | "new_unsealed" | "used";
 
+// "draft" exists in the database but isn't used yet: listings go live when saved.
+export type ListingStatus = "draft" | "active" | "sold" | "removed";
+
 export interface Seller {
   id: string;
   displayName: string;
@@ -18,7 +21,8 @@ export interface SourceBottle {
   house: string;
   name: string;
   sizeMl: number;
-  batchCode: string;
+  // Not every bottle has one.
+  batchCode?: string;
   videoUrl: string;
   receiptUrl?: string;
   // Set once an admin has checked the video and batch code.
@@ -35,12 +39,14 @@ export interface Listing {
   // Only meaningful for partial bottles.
   fillPercent?: number;
   condition: Condition;
-  batchCode: string;
+  // Not every bottle has one.
+  batchCode?: string;
   pricePence: number;
   postagePence: number;
   receiptVerified: boolean;
-  // Required for decants.
+  // Optional for decants. A checked bottle earns the "Verified source" badge.
   sourceBottleId?: string;
+  status: ListingStatus;
   photos: string[];
   notes: string[];
 }
