@@ -18,6 +18,7 @@ Where a spec and the brief's "Decisions so far" table disagree, the table wins.
 | 008 | [Disputes and refunds](008-disputes/spec.md) | [plan](008-disputes/plan.md) · [tasks](008-disputes/tasks.md) | 003, 004, 007, 009 |
 | 009 | Admin console | In Bilal's PR #3 (bottle, receipt and ID review) | — |
 | 010 | [Notifications](010-notifications/spec.md) | [plan](010-notifications/plan.md) · [tasks](010-notifications/tasks.md) | 003–009 |
+| 011 | [Usernames, member profiles and two-way reviews](011-member-profiles/spec.md) (005 Q-4) | After the spec is merged | 004, 005 |
 
 **009** starts with Bilal's admin review spec in PR #3. Once that's merged, it needs these added:
 - the dispute queue and decision form (008)
@@ -83,7 +84,7 @@ Already settled by Bilal in PR #8: Buyer Protection is 3% + 30p (003 Q-1). A fai
 **Trust and reviews**
 - **005 Q-1 and Q-2 (brief Q-8):** The review count for certification, and whether swap reviews count.
 - **005 Q-3:** The review window, and whether sellers can reply.
-- **005 Q-4:** Do sellers review buyers?
+- **005 Q-4:** Do sellers review buyers? Settled: yes, as on Vinted. Specified in [011](011-member-profiles/spec.md).
 - **005 Q-6:** An 18+ age limit?
 
 **Messaging**
