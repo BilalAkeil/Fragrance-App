@@ -9,12 +9,14 @@ export interface ListingFilter {
   minPence?: number;
   maxPence?: number;
   certifiedOnly?: boolean;
+  // A catalogue house id: only listings matched to that house's fragrances.
+  houseId?: string;
 }
 
 const KINDS: readonly ListingKind[] = ["full", "partial", "decant"];
 const CONDITIONS: readonly Condition[] = ["new_sealed", "new_unsealed", "used"];
 
-// Reads browse filters from URL search params (?q=&kind=&condition=&min=&max=&certified=1).
+// Reads browse filters from URL search params (?q=&kind=&condition=&min=&max=&certified=1&house=).
 // Anything unrecognised is ignored rather than rejected.
 export function listingFilterFromParams(params: Record<string, string | undefined>): ListingFilter {
   const filter: ListingFilter = {};
@@ -27,6 +29,8 @@ export function listingFilterFromParams(params: Record<string, string | undefine
   if (Number.isFinite(min)) filter.minPence = min;
   if (Number.isFinite(max)) filter.maxPence = max;
   if (params.certified === "1") filter.certifiedOnly = true;
+  const house = params.house?.trim();
+  if (house) filter.houseId = house;
   return filter;
 }
 
@@ -35,6 +39,7 @@ export function matchesFilter(listing: Listing, seller: Seller | undefined, filt
   if (filter.condition && listing.condition !== filter.condition) return false;
   if (filter.minPence !== undefined && listing.pricePence < filter.minPence) return false;
   if (filter.maxPence !== undefined && listing.pricePence > filter.maxPence) return false;
+  if (filter.houseId && listing.houseId !== filter.houseId) return false;
   if (filter.certifiedOnly && (!seller || certificationStatus(seller) !== "certified")) return false;
   const query = filter.query?.trim().toLowerCase();
   if (query && ![listing.house, listing.name, ...listing.notes].some((s) => s.toLowerCase().includes(query))) {

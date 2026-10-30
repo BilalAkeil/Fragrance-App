@@ -65,3 +65,13 @@ How we'll build [spec.md](spec.md). Shared design: [docs/architecture.md](../../
 
 - The size of the starting catalogue depends on Q-1. Without at least a few hundred common fragrances, most listings will start out unmatched. Budget admin time.
 - A guide price goes stale without upkeep. The swap screens show when each price was last updated.
+
+## Changes while building
+
+- **Admin writes don't use a service client.** As in PR #3's admin screens, they go through the admin's own client: RLS lets only admins change the catalogue, and matching and merging are security-definer functions that check `is_admin()`. So the web app still has no service-role key before 003.
+- **The database copies the catalogue's spelling** onto a matched listing or bottle (a trigger), whatever the seller's browser sends (AC-1.3). The name includes the concentration, for example "Sauvage Eau de Parfum" (`fragranceDisplayName` in core), so EDT and EDP stay distinct wherever the name shows.
+- **"Most common size" (R-4)** means the size with the most listings of that fragrance (full bottles and partials, not removed). Ties, including no listings at all, go to the larger size.
+- **A full bottle or partial of a size the catalogue doesn't have** gets no guide value, the same as an unpriced one (AC-4.4).
+- **Bottles join the unmatched queue** alongside listings, with `admin_match_bottle` (`0009`).
+- **Migrations:** `0006_catalogue`, then two fixes after it ran on dev: `0007` moves `pg_trgm` out of `public` (security advisor), and `0008` rewrites the accent list as ASCII escapes after it reached dev garbled.
+- **The brand filter only shows listings matched to the catalogue.** A typed-in listing appears under its brand once an admin matches it. See the open question in the PR.

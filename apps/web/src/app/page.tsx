@@ -62,7 +62,7 @@ export default async function Home({
     Object.fromEntries(Object.entries(params).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v])),
   );
   const q = filter.query;
-  const listings = await marketplace.listListings(filter);
+  const [listings, houses] = await Promise.all([marketplace.listListings(filter), marketplace.listHouses()]);
   const sellers = await marketplace.getSellers([...new Set(listings.map((l) => l.sellerId))]);
 
   return (
@@ -119,7 +119,7 @@ export default async function Home({
       <section id="listings" className="flex scroll-mt-6 flex-col gap-5">
         <h2 className="text-2xl font-extrabold tracking-tight">{q ? `Results for “${q}”` : "Just listed"}</h2>
         {!marketplace.live && <SampleDataNotice />}
-        <ListingBrowser listings={listings} sellers={sellers} filter={filter} />
+        <ListingBrowser listings={listings} sellers={sellers} houses={houses} filter={filter} />
       </section>
 
       <section className="flex flex-col gap-6">

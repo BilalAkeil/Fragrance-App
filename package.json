@@ -11,5 +11,8 @@
     "build:web": "npm run build --workspace @fragrance/web",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
   }
 }

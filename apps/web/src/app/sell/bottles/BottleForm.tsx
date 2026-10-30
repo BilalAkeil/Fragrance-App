@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { CataloguePicker, UNPICKED_ERROR } from "@/components/CataloguePicker";
 import { Field, inputClass } from "@/components/Field";
 import { createClient } from "@/lib/supabase/client";
 import { uploadToOwnFolder } from "@/lib/upload";
@@ -12,6 +13,8 @@ export interface ExistingBottle {
   id: string;
   house: string;
   name: string;
+  fragranceId?: string;
+  houseId?: string;
   sizeMl: number;
   batchCode?: string;
   hasReceipt: boolean;
@@ -28,6 +31,14 @@ export function BottleForm({ userId, existing }: { userId: string; existing?: Ex
     const video = form.get("video");
     const receipt = form.get("receipt");
     const hasVideo = video instanceof File && video.size > 0;
+    if (form.get("catalogueState") === "unpicked") {
+      setError(UNPICKED_ERROR);
+      return;
+    }
+    if (!String(form.get("house")).trim() || !String(form.get("name")).trim()) {
+      setError("Enter the brand and the fragrance name.");
+      return;
+    }
     if (!existing && !hasVideo) {
       setError("Add a video of the bottle.");
       return;
@@ -44,6 +55,7 @@ export function BottleForm({ userId, existing }: { userId: string; existing?: Ex
       const fields = {
         house: String(form.get("house")).trim(),
         name: String(form.get("name")).trim(),
+        fragrance_id: String(form.get("fragranceId") ?? "") || null,
         size_ml: Number(form.get("sizeMl")),
         batch_code: String(form.get("batchCode") ?? "").trim() || null,
         // When editing, files are only replaced if a new one was chosen.
@@ -72,12 +84,16 @@ export function BottleForm({ userId, existing }: { userId: string; existing?: Ex
   return (
     <form onSubmit={submit} className="grid max-w-2xl gap-5 rounded-2xl border border-line bg-white p-6">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Brand">
-          <input name="house" required defaultValue={existing?.house} className={inputClass} />
-        </Field>
-        <Field label="Fragrance name">
-          <input name="name" required defaultValue={existing?.name} className={inputClass} />
-        </Field>
+        <CataloguePicker
+          initial={
+            existing && {
+              fragranceId: existing.fragranceId,
+              houseId: existing.houseId,
+              house: existing.house,
+              name: existing.name,
+            }
+          }
+        />
         <Field label="Bottle size (ml)">
           <input name="sizeMl" type="number" min={5} required defaultValue={existing?.sizeMl} className={inputClass} />
         </Field>

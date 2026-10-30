@@ -13,7 +13,7 @@ export default async function EditBottlePage({ params }: { params: Promise<{ id:
 
   const { data: bottle } = await supabase
     .from("source_bottles")
-    .select("id, seller_id, house, name, size_ml, batch_code, receipt_path, verified_at")
+    .select("id, seller_id, house, name, fragrance_id, fragrances(house_id), size_ml, batch_code, receipt_path, verified_at")
     .eq("id", id)
     .maybeSingle();
   if (!bottle || bottle.seller_id !== user.id) notFound();
@@ -35,6 +35,9 @@ export default async function EditBottlePage({ params }: { params: Promise<{ id:
           id: bottle.id,
           house: bottle.house,
           name: bottle.name,
+          fragranceId: bottle.fragrance_id ?? undefined,
+          // A many-to-one embed is one object at runtime, not the array the untyped client infers.
+          houseId: (bottle.fragrances as unknown as { house_id: string } | null)?.house_id,
           sizeMl: bottle.size_ml,
           batchCode: bottle.batch_code ?? undefined,
           hasReceipt: Boolean(bottle.receipt_path),

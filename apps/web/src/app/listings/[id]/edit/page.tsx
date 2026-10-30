@@ -16,7 +16,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
   const { data: listing } = await supabase
     .from("listings")
     .select(
-      "id, seller_id, kind, house, name, size_ml, fill_percent, condition, batch_code, price_pence, postage_pence, notes, source_bottle_id, receipt_path, status, listing_photos(id, path, position)",
+      "id, seller_id, kind, house, name, fragrance_id, fragrances(house_id), size_ml, fill_percent, condition, batch_code, price_pence, postage_pence, notes, source_bottle_id, receipt_path, status, listing_photos(id, path, position)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -43,6 +43,9 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
           kind: listing.kind,
           house: listing.house,
           name: listing.name,
+          fragranceId: listing.fragrance_id ?? undefined,
+          // A many-to-one embed is one object at runtime, not the array the untyped client infers.
+          houseId: (listing.fragrances as unknown as { house_id: string } | null)?.house_id,
           sizeMl: listing.size_ml,
           fillPercent: listing.fill_percent ?? undefined,
           condition: listing.condition,
