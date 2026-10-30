@@ -4,9 +4,9 @@ import type { Listing, Seller, SourceBottle } from "./types";
 // Placeholder data for building screens before the database is connected.
 
 export const sampleSellers: Seller[] = [
-  { id: "s1", displayName: "ScentShelf", idVerified: true, reviewCount: 42, averageRating: 4.8 },
-  { id: "s2", displayName: "DecantDen", idVerified: true, reviewCount: 3, averageRating: 5 },
-  { id: "s3", displayName: "NewNose", idVerified: false, reviewCount: 0, averageRating: 0 },
+  { id: "s1", displayName: "ScentShelf", idVerified: true, reviewCount: 42, averageRating: 4.8, payoutsReady: true },
+  { id: "s2", displayName: "DecantDen", idVerified: true, reviewCount: 3, averageRating: 5, payoutsReady: true },
+  { id: "s3", displayName: "NewNose", idVerified: false, reviewCount: 0, averageRating: 0, payoutsReady: false },
 ];
 
 // The starter catalogue for the sample listings. Guide prices are made-up

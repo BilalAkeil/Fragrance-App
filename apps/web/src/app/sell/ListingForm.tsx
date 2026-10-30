@@ -89,7 +89,8 @@ export function ListingForm({
       condition: text("condition") as Condition,
       batchCode: text("batchCode").trim() || undefined,
       pricePence: parsePounds(text("price")),
-      postagePence: parsePounds(text("postage")),
+      // 004: the buyer picks and pays for delivery at checkout, so sellers no longer set postage.
+      postagePence: 0,
       notes: parseNotes(text("notes")),
       sourceBottleId: kind === "decant" ? text("sourceBottleId") || undefined : undefined,
     };
@@ -253,15 +254,6 @@ export function ListingForm({
             inputMode="decimal"
             required
             defaultValue={existing ? pounds(existing.pricePence) : undefined}
-            className={inputClass}
-          />
-        </Field>
-        <Field label="Postage (£)" hint="Tracked postage with any carrier.">
-          <input
-            name="postage"
-            inputMode="decimal"
-            required
-            defaultValue={existing ? pounds(existing.postagePence) : undefined}
             className={inputClass}
           />
         </Field>

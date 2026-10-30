@@ -40,6 +40,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         >
           Catalogue
         </Link>
+        {(process.env.SHIPPING_PROVIDER ?? "fake") === "fake" && (
+          <Link
+            href="/admin/shipments"
+            className="rounded-lg px-3 py-2.5 text-sm font-semibold text-line hover:bg-neutral-ink hover:text-white"
+          >
+            Test shipments
+          </Link>
+        )}
       </nav>
       <div className="min-w-0 flex-1">{children}</div>
     </div>

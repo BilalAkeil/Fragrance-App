@@ -45,6 +45,13 @@ describe("validateListingInput", () => {
     expect(validateListingInput(base, 1)).toEqual([]);
   });
 
+  it("refuses bottles Royal Mail won't carry (004 Q-6)", () => {
+    expect(validateListingInput({ ...base, sizeMl: 150 }, 1)).toEqual([]);
+    expect(validateListingInput({ ...base, sizeMl: 200 }, 1)).toEqual([
+      "Royal Mail only takes perfume up to 150ml, so bigger bottles can't be listed yet.",
+    ]);
+  });
+
   it("accepts a listing with no batch code", () => {
     expect(validateListingInput({ ...base, batchCode: undefined }, 1)).toEqual([]);
   });

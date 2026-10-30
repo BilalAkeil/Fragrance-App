@@ -9,11 +9,22 @@ import { KIND_LABELS } from "@/components/labels";
 import { BOTTLE_STATUS_LABELS, loadOwnBottles } from "@/lib/bottles";
 import { getCurrentSeller } from "@/lib/supabase/server";
 import { RemoveListingButton } from "../listings/[id]/RemoveListingButton";
-import { createSellerProfile, signOut } from "./actions";
+import { createSellerProfile, setDispatchPostcode, signOut } from "./actions";
+import { startPayoutSetup } from "./payouts/actions";
+import { PAYOUT_STATUS_TEXT, payoutStatus, retrievePayoutAccount, type PayoutStatus } from "@/lib/payouts";
+import { stripeConfigured } from "@/lib/stripe";
+import { createServiceClient } from "@/lib/supabase/service";
 
 const ERRORS: Record<string, string> = {
   name: "Choose a shop name between 2 and 40 characters.",
   save: "That name couldn't be saved. Please try again.",
+};
+
+const PAYOUT_STATUS_LABELS: Record<PayoutStatus, string> = {
+  not_started: "Not set up",
+  in_progress: "In progress",
+  needs_info: "Needs more information",
+  ready: "Ready",
 };
 
 const LISTING_GROUPS = [
@@ -25,12 +36,12 @@ const LISTING_GROUPS = [
 export default async function AccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; removed?: string }>;
+  searchParams: Promise<{ error?: string; removed?: string; payouts?: string; postcode?: string }>;
 }) {
   if (!supabaseConfigured) return <NotConnected />;
   const { supabase, user, seller } = await getCurrentSeller();
   if (!user) redirect("/login");
-  const { error, removed } = await searchParams;
+  const { error, removed, payouts, postcode } = await searchParams;
 
   const [listings, bottles, receiptRejections] = seller
     ? await Promise.all([
@@ -50,6 +61,20 @@ export default async function AccountPage({
           .order("decided_at"),
       ])
     : [null, [], null];
+
+  // 003 AC-3.1: payouts, read live from Stripe. 004: where the seller posts from.
+  let payoutState: PayoutStatus = "not_started";
+  let dispatchPostcode: string | null = null;
+  if (seller) {
+    const [{ data: account }, { data: settings }] = await Promise.all([
+      createServiceClient().from("sellers").select("stripe_account_id").eq("id", seller.id).single(),
+      supabase.from("seller_settings").select("dispatch_postcode").eq("seller_id", seller.id).maybeSingle(),
+    ]);
+    dispatchPostcode = settings?.dispatch_postcode ?? null;
+    if (account?.stripe_account_id && stripeConfigured) {
+      payoutState = payoutStatus(await retrievePayoutAccount(account.stripe_account_id).catch(() => undefined));
+    }
+  }
 
   // A rejection only applies to the file it was made on. Later ones overwrite earlier ones.
   const reasons = new Map(
@@ -101,6 +126,42 @@ export default async function AccountPage({
                 Register a bottle for decants
               </Link>
             </div>
+          </section>
+
+          <section id="payouts" className={`${panel} flex flex-col gap-3`}>
+            <h2 className="text-lg font-extrabold">Payouts</h2>
+            <p className="text-sm">
+              <span className={payoutState === "ready" ? "font-semibold text-verified" : "font-semibold"}>
+                {PAYOUT_STATUS_LABELS[payoutState]}.
+              </span>{" "}
+              <span className="text-muted">{PAYOUT_STATUS_TEXT[payoutState]}</span>
+            </p>
+            {payouts === "error" && <p className="text-sm text-danger">Stripe couldn&apos;t start payout setup. Please try again in a few minutes.</p>}
+            {payoutState !== "ready" &&
+              (stripeConfigured ? (
+                <form action={startPayoutSetup}>
+                  <button className={buttonPrimary}>
+                    {payoutState === "not_started" ? "Set up payouts" : "Continue with Stripe"}
+                  </button>
+                </form>
+              ) : (
+                <p className="text-sm text-muted">Payouts need the Stripe keys, which aren&apos;t set on this site yet.</p>
+              ))}
+            <form action={setDispatchPostcode} className="mt-2 flex flex-wrap items-end gap-3 border-t border-line pt-4 text-sm">
+              <label className="flex flex-col gap-1 font-bold">
+                Where you post from (postcode)
+                <input
+                  name="postcode"
+                  defaultValue={dispatchPostcode ?? ""}
+                  placeholder="For example LS1 1AA"
+                  className={`${inputClass} w-44 font-normal`}
+                />
+              </label>
+              <button className={buttonSecondary}>Save</button>
+              <span className="w-full text-muted">Used to price delivery. Only you can see it.</span>
+              {postcode === "saved" && <span className="text-verified">Saved.</span>}
+              {postcode === "invalid" && <span className="text-danger">Enter a UK postcode, for example LS1 1AA.</span>}
+            </form>
           </section>
 
           <section className="flex flex-col gap-4">

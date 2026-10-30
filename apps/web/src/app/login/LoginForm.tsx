@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/client";
 import { inputClass } from "@/components/Field";
 import { buttonPrimary } from "@/components/ui";
 
-export function LoginForm() {
+// `next` is where the sign-in link brings you back to.
+export function LoginForm({ next }: { next: string }) {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string>();
@@ -16,7 +17,7 @@ export function LoginForm() {
     setError(undefined);
     const { error } = await createClient().auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/account` },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
     });
     if (error) {
       setError(error.message);

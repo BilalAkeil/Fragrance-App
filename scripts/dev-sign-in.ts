@@ -2,7 +2,7 @@
 // built-in email sender only allows a couple of emails an hour, which runs out
 // fast when testing.
 //
-//   npx tsx scripts/dev-sign-in.ts you@example.com [http://localhost:3000]
+//   npx tsx scripts/dev-sign-in.ts you@example.com [http://localhost:3000] [/page/to/land/on]
 //
 // Open the printed link in any browser and you're signed in as that user. If
 // there's no account for the address yet, it creates one, as signing up would.
@@ -17,9 +17,9 @@ import { createClient } from "@supabase/supabase-js";
 const ENV_FILE = "apps/web/.env.local";
 
 async function main() {
-  const [email, site = "http://localhost:3000"] = process.argv.slice(2);
+  const [email, site = "http://localhost:3000", next = "/account"] = process.argv.slice(2);
   if (!email?.includes("@")) {
-    console.error("Usage: npx tsx scripts/dev-sign-in.ts <email> [site, default http://localhost:3000]");
+    console.error("Usage: npx tsx scripts/dev-sign-in.ts <email> [site, default http://localhost:3000] [page, default /account]");
     process.exit(1);
   }
   if (existsSync(ENV_FILE)) process.loadEnvFile(ENV_FILE);
@@ -42,8 +42,9 @@ async function main() {
 
   const params = new URLSearchParams({
     token_hash: link.data.properties.hashed_token,
-    type: "magiclink",
-    next: "/account",
+    // "signup" for an address that has never signed in, "magiclink" otherwise.
+    type: link.data.properties.verification_type,
+    next,
   });
   console.log(`${site}/auth/callback?${params}`);
 }

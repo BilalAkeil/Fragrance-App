@@ -27,7 +27,9 @@ export interface CheckoutBreakdown {
   protectionFeePence: number;
   buyerTotalPence: number;
   cardFeePence: number;
+  // R-2: the item price only. Postage pays for the label, which the platform buys.
   sellerReceivesPence: number;
+  // The Buyer Protection fee left after card processing.
   platformKeepsPence: number;
 }
 
@@ -45,7 +47,7 @@ export function checkoutBreakdown(
     protectionFeePence,
     buyerTotalPence,
     cardFeePence,
-    sellerReceivesPence: itemPence + postagePence,
+    sellerReceivesPence: itemPence,
     platformKeepsPence: protectionFeePence - cardFeePence,
   };
 }

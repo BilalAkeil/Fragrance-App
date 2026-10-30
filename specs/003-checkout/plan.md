@@ -80,3 +80,20 @@ How we'll build [spec.md](spec.md). Shared design: [docs/architecture.md](../../
 
 - **Test the webhook ordering.** The buyer can land on `/checkout/return` before the webhook arrives, so the confirmation page waits briefly for the order.
 - **VAT on the fee (Q-5) needs an accountant.** No code depends on it yet.
+
+## Changes while building
+
+- **Built together with 004** in one PR, since each needs the other.
+- **Reservations last 31 minutes**, not 30 (`RESERVATION_MINUTES`). A Checkout Session must expire at least 30 minutes after it's created, and it expires with the reservation, so the extra minute covers the time to create it.
+- **Seller payouts use Accounts v2.** Stripe no longer lets new platforms create the older Express accounts. Each seller is a v2 account:
+  - a "recipient" configuration with the Express Dashboard
+  - the platform pays the fees and covers losses, which Stripe requires for separate charges and transfers
+  - ready when `stripe_transfers` is active
+  - account changes arrive as v2 thin events on `/api/webhooks/stripe/accounts`, not `account.updated`
+
+  Stripe only allows the platform to cover losses after the loss-liability acknowledgement in its Platform profile (`docs/setup/stripe.md`).
+- **Stripe versions:** API `2026-09-30`, Node SDK 23 and Stripe.js 10. Embedded Checkout is `ui_mode: "embedded_page"`.
+- **No `getCheckoutSummary`.** The checkout page uses the marketplace's `getListing` and `getSellers`, which now carry the reservation and `payoutsReady`.
+- **Postage is chosen at checkout, as 001's spec said it would be.** The sell form no longer asks the seller for it, and the listing page shows "from" the cheapest quote.
+- **Sign-in comes back to the listing** (AC-1.1). `/login` takes a `next` page.
+- **`orders.stripe_refund_id`** (`0014`): the scheduled job retries a refund or a payout that failed part-way.

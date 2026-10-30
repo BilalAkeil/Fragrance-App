@@ -1,4 +1,5 @@
 import { MIN_DECANT_ML } from "./decants";
+import { ROYAL_MAIL_MAX_ML } from "./shipping";
 import type { Condition, ListingKind, ListingStatus } from "./types";
 
 export interface ListingInput {
@@ -35,6 +36,10 @@ export function validateListingInput(input: ListingInput, photoCount: number): s
   if (!input.house.trim()) errors.push("Add the brand.");
   if (!input.name.trim()) errors.push("Add the fragrance name.");
   if (!Number.isInteger(input.sizeMl) || input.sizeMl <= 0) errors.push("Add the size in ml.");
+  // 004 plan Q-6: Royal Mail won't carry bigger bottles, so they can't be listed.
+  else if (input.sizeMl > ROYAL_MAIL_MAX_ML) {
+    errors.push(`Royal Mail only takes perfume up to ${ROYAL_MAIL_MAX_ML}ml, so bigger bottles can't be listed yet.`);
+  }
   if (!Number.isFinite(input.pricePence) || input.pricePence <= 0) errors.push("Add a price.");
   if (!Number.isFinite(input.postagePence) || input.postagePence < 0) {
     errors.push("Add the postage price, or 0 for free postage.");

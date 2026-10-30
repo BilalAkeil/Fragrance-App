@@ -13,6 +13,8 @@ export interface Seller {
   idVerified: boolean;
   reviewCount: number;
   averageRating: number;
+  // 003 AC-3.1: set once Stripe can pay them. Their listings can't be bought before.
+  payoutsReady: boolean;
 }
 
 export interface SourceBottle {
@@ -55,6 +57,9 @@ export interface Listing {
   status: ListingStatus;
   photos: string[];
   notes: string[];
+  // 003 AC-2.1: someone is checking out this listing until then.
+  reservedBy?: string;
+  reservedUntil?: string;
 }
 
 export interface Review {
