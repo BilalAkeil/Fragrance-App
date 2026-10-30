@@ -23,6 +23,7 @@ const ERRORS: Record<string, string> = {
 };
 
 const pounds = (pence: number) => (pence / 100).toFixed(2);
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 export default async function AdminFragrancePage({
   params,
@@ -81,7 +82,7 @@ export default async function AdminFragrancePage({
         </h1>
         <p className="text-muted">
           {CONCENTRATION_LABELS[concentration]}
-          {fragrance.launch_year ? `, ${fragrance.launch_year}` : ""} · {listingCount ?? 0} listings matched
+          {fragrance.launch_year ? `, ${fragrance.launch_year}` : ""} · {plural(listingCount ?? 0, "listing")} matched
         </p>
       </div>
 
@@ -114,7 +115,7 @@ export default async function AdminFragrancePage({
                   </label>
                   <button className={buttonSecondary}>Update</button>
                   <span className="text-muted">
-                    {s.listingCount ?? 0} listings
+                    {plural(s.listingCount ?? 0, "listing")}
                     {s.updatedAt ? ` · set ${new Date(s.updatedAt).toLocaleDateString("en-GB")}` : ""}
                   </span>
                 </form>

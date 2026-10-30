@@ -19,5 +19,5 @@
 - [x] `/admin/catalogue` list, the fragrance page with sizes and price history, the Unmatched queue, merge (AC-3)
 
 ## Check
-- [ ] `npm test` and `npm run typecheck` pass
-- [ ] Each acceptance criterion is checked: pick from the list, type a missing one, an admin matches it, search finds it, guide values come out right
+- [x] `npm test` and `npm run typecheck` pass
+- [x] Each acceptance criterion is checked: pick from the list, type a missing one, an admin matches it, search finds it, guide values come out right
