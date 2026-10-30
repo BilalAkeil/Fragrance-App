@@ -80,3 +80,12 @@ How we'll build [spec.md](spec.md). Shared design: [docs/architecture.md](../../
 - **The real provider:** needs answers from Sendcloud or Royal Mail (research doc).
 - **Cron frequency:** depends on the Vercel plan.
 - **Parcel weights:** estimates from ml until a seller can weigh parcels.
+
+## Changes while building
+
+- **The dispatch postcode is in `seller_settings`**, not on `sellers`. Everyone can read `sellers`, and the spec says only the seller can see the postcode.
+- **`getQuote` is in the web app's `lib/shipping`**, not `packages/api`. Shipping providers are server-only.
+- **Notifications:** 010's `notifications` table (`0012`), `notify()`, and the order events in core are built. The notifications page and emails are still 010's.
+- **"Report a problem"** shows but stays disabled until 008.
+- **The dev-only Test shipments page** can also make a deadline overdue and run the scheduled job, so cancellation and auto-completion can be tested without waiting.
+- **The cron schedule isn't set up yet.** It depends on the Vercel plan (Hobby only allows daily jobs). The job runs at `/api/cron/tick` with `CRON_SECRET` as soon as Vercel Cron or `pg_cron` calls it.

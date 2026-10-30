@@ -25,5 +25,5 @@ Built alongside 004. Needs Stripe test keys and the service-role key on this mac
 - [x] The Payouts section on `/account` (AC-3.1)
 
 ## Check
-- [ ] `npm test` and `npm run typecheck` pass
-- [ ] In Stripe test mode, with `stripe listen`: a successful card payment, a declined card, two buyers at once, the seller's payout onboarding, and an order completed by 004 sending the transfer
+- [x] `npm test` and `npm run typecheck` pass
+- [x] In Stripe test mode, with `stripe listen`: a successful card payment, a declined card, two buyers at once, the seller's payout onboarding, and an order completed by 004 sending the transfer

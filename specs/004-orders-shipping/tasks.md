@@ -15,7 +15,8 @@ Built alongside 003. Uses the `fake` shipping provider until the broker is chose
 - [x] `lib/shipping/` interface and `fake` provider
 - [x] Shipment and label on payment, plus the label download route (AC-2.1)
 - [x] `/api/webhooks/shipping`: shipped and delivered (AC-3)
-- [ ] `/api/cron/tick`: cancel unshipped orders (refund) and complete delivered ones (payout), plus the cron config (R-2, R-4, AC-2.3, AC-4.3)
+- [x] `/api/cron/tick`: cancel unshipped orders (refund) and complete delivered ones (payout) (R-2, R-4, AC-2.3, AC-4.3)
+- [ ] The cron config: waits on the Vercel plan (Hobby only runs daily), or `pg_cron`
 - [x] `confirmEverythingOk` and `setDispatchPostcode` server actions (AC-4.1)
 - [x] `listOrders`, `getOrder` and `getQuote` in `packages/api`
 - [x] The notifications table and `notify()` from the 010 plan, raising the order events
@@ -27,5 +28,5 @@ Built alongside 003. Uses the `fake` shipping provider until the broker is chose
 - [x] Dispatch postcode on `/account`
 
 ## Check
-- [ ] `npm test` and `npm run typecheck` pass
-- [ ] End to end with Stripe test mode and the `fake` provider: buy → label → shipped → delivered → Everything's OK → transfer. Also: not shipped → cancelled and refunded, and delivered → 48 hours → auto-complete
+- [x] `npm test` and `npm run typecheck` pass
+- [x] End to end with Stripe test mode and the `fake` provider: buy → label → shipped → delivered → Everything's OK → transfer. Also: not shipped → cancelled and refunded, and delivered → 48 hours → auto-complete
