@@ -42,7 +42,8 @@ async function main() {
 
   const params = new URLSearchParams({
     token_hash: link.data.properties.hashed_token,
-    type: "magiclink",
+    // "signup" for an address that has never signed in, "magiclink" otherwise.
+    type: link.data.properties.verification_type,
     next,
   });
   console.log(`${site}/auth/callback?${params}`);
