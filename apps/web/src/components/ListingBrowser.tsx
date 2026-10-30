@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatGBP, type ListingFilter, type Listing, type ListingKind, type Seller } from "@fragrance/core";
+import { formatGBP, type House, type ListingFilter, type Listing, type ListingKind, type Seller } from "@fragrance/core";
 import { BottleTile } from "./BottleTile";
 import { inputClass } from "./Field";
 import { CONDITION_LABELS, KIND_LABELS } from "./labels";
@@ -15,7 +15,7 @@ const KIND_FILTERS: { value?: ListingKind; label: string }[] = [
 
 const pounds = (pence?: number) => (pence === undefined ? "" : String(pence / 100));
 
-// The browse URL for a filter, e.g. /?q=oud&kind=decant&certified=1#listings
+// The browse URL for a filter, e.g. /?q=oud&kind=decant&certified=1&house=<id>#listings
 export function browseHref(filter: ListingFilter): string {
   const params = new URLSearchParams();
   if (filter.query) params.set("q", filter.query);
@@ -24,6 +24,7 @@ export function browseHref(filter: ListingFilter): string {
   if (filter.minPence !== undefined) params.set("min", pounds(filter.minPence));
   if (filter.maxPence !== undefined) params.set("max", pounds(filter.maxPence));
   if (filter.certifiedOnly) params.set("certified", "1");
+  if (filter.houseId) params.set("house", filter.houseId);
   const query = params.toString();
   return `/${query ? `?${query}` : ""}#listings`;
 }
@@ -32,10 +33,13 @@ export function browseHref(filter: ListingFilter): string {
 export function ListingBrowser({
   listings,
   sellers,
+  houses,
   filter,
 }: {
   listings: Listing[];
   sellers: Seller[];
+  // Catalogue houses for the house filter.
+  houses: House[];
   filter: ListingFilter;
 }) {
   const filtered = Object.keys(filter).length > 0;
@@ -63,6 +67,17 @@ export function ListingBrowser({
         <form action="/#listings" className="flex flex-wrap items-end gap-3 text-sm">
           {filter.query && <input type="hidden" name="q" value={filter.query} />}
           {filter.kind && <input type="hidden" name="kind" value={filter.kind} />}
+          <label className="flex flex-col gap-1 font-bold">
+            Brand
+            <select name="house" defaultValue={filter.houseId ?? ""} className={inputClass}>
+              <option value="">Any</option>
+              {houses.map((h) => (
+                <option key={h.id} value={h.id}>
+                  {h.name}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="flex flex-col gap-1 font-bold">
             Condition
             <select name="condition" defaultValue={filter.condition ?? ""} className={inputClass}>

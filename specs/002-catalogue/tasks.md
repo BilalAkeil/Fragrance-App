@@ -14,8 +14,8 @@
 - [ ] Admin actions: add and edit, set guide price, match an unmatched listing, merge (AC-3)
 
 ## Web
-- [ ] House and fragrance pickers with the free-text fallback in ListingForm and BottleForm (AC-1)
-- [ ] House filter on browse (AC-2.2)
+- [x] House and fragrance pickers with the free-text fallback in ListingForm and BottleForm (AC-1)
+- [x] House filter on browse (AC-2.2)
 - [ ] `/admin/catalogue` list, the fragrance page with sizes and price history, the Unmatched queue, merge (AC-3)
 
 ## Check

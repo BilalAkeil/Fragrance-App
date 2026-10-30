@@ -10,6 +10,7 @@ import {
   type ListingInput,
   type ListingKind,
 } from "@fragrance/core";
+import { CataloguePicker, UNPICKED_ERROR } from "@/components/CataloguePicker";
 import { Field, inputClass } from "@/components/Field";
 import { createClient } from "@/lib/supabase/client";
 import { uploadToOwnFolder } from "@/lib/upload";
@@ -33,6 +34,9 @@ export interface ExistingListing {
   kind: ListingKind;
   house: string;
   name: string;
+  // Set when the listing is matched to the catalogue.
+  fragranceId?: string;
+  houseId?: string;
   sizeMl: number;
   fillPercent?: number;
   condition: Condition;
@@ -93,6 +97,7 @@ export function ListingForm({
     const receipt = form.get("receipt");
 
     const found = validateListingInput(input, photos.length + newPhotos.length);
+    if (text("catalogueState") === "unpicked") found.unshift(UNPICKED_ERROR);
     setErrors(found);
     if (found.length) return;
 
@@ -108,8 +113,10 @@ export function ListingForm({
       );
 
       const fields = {
+        // The database copies the catalogue's spelling over these when it's matched.
         house: input.house,
         name: input.name,
+        fragrance_id: text("fragranceId") || null,
         size_ml: input.sizeMl,
         fill_percent: input.fillPercent ?? null,
         condition: input.condition,
@@ -204,12 +211,16 @@ export function ListingForm({
         </Field>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Brand">
-          <input name="house" required defaultValue={existing?.house} className={inputClass} />
-        </Field>
-        <Field label="Fragrance name">
-          <input name="name" required defaultValue={existing?.name} className={inputClass} />
-        </Field>
+        <CataloguePicker
+          initial={
+            existing && {
+              fragranceId: existing.fragranceId,
+              houseId: existing.houseId,
+              house: existing.house,
+              name: existing.name,
+            }
+          }
+        />
         <Field label="Size (ml)">
           <input name="sizeMl" type="number" min={1} required defaultValue={existing?.sizeMl} className={inputClass} />
         </Field>
