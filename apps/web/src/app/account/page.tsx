@@ -115,7 +115,9 @@ export default async function AccountPage({
               {seller.id_verified ? (
                 <span className="font-semibold text-verified">verified</span>
               ) : (
-                <span className="text-muted">not done yet (coming with payments)</span>
+                <Link href="/account/verify" className="font-bold text-brand underline">
+                  verify your ID to start selling
+                </Link>
               )}
             </p>
             <div className="mt-4 flex flex-wrap gap-3">

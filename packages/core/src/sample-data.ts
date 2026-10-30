@@ -1,12 +1,68 @@
 import type { Fragrance, FragranceSize, House } from "./catalogue";
-import type { Listing, Seller, SourceBottle } from "./types";
+import type { Listing, Review, Seller, SourceBottle } from "./types";
 
 // Placeholder data for building screens before the database is connected.
 
 export const sampleSellers: Seller[] = [
-  { id: "s1", displayName: "ScentShelf", idVerified: true, reviewCount: 42, averageRating: 4.8, payoutsReady: true },
-  { id: "s2", displayName: "DecantDen", idVerified: true, reviewCount: 3, averageRating: 5, payoutsReady: true },
-  { id: "s3", displayName: "NewNose", idVerified: false, reviewCount: 0, averageRating: 0, payoutsReady: false },
+  {
+    id: "s1",
+    displayName: "ScentShelf",
+    idVerified: true,
+    reviewCount: 42,
+    averageRating: 4.8,
+    payoutsReady: true,
+    joinedAt: "2026-03-14T10:00:00Z",
+  },
+  {
+    id: "s2",
+    displayName: "DecantDen",
+    idVerified: true,
+    reviewCount: 3,
+    averageRating: 5,
+    payoutsReady: true,
+    joinedAt: "2026-09-02T10:00:00Z",
+  },
+  {
+    id: "s3",
+    displayName: "NewNose",
+    idVerified: false,
+    reviewCount: 0,
+    averageRating: 0,
+    payoutsReady: false,
+    joinedAt: "2026-10-20T10:00:00Z",
+  },
+];
+
+// A few of each seller's reviews, newest first. The counts and averages above
+// stand for their full history.
+export const sampleReviews: Review[] = [
+  {
+    id: "r1",
+    orderId: "o1",
+    revieweeId: "s1",
+    rating: 5,
+    text: "Sealed bottle exactly as listed, and very well packed.",
+    createdAt: "2026-10-24T18:20:00Z",
+  },
+  {
+    id: "r2",
+    orderId: "o2",
+    revieweeId: "s1",
+    rating: 4,
+    text: "Genuine and as described. Took a few days to send.",
+    createdAt: "2026-10-12T09:05:00Z",
+  },
+  { id: "r3", orderId: "o3", revieweeId: "s1", rating: 5, text: "", createdAt: "2026-09-30T14:40:00Z" },
+  {
+    id: "r4",
+    orderId: "o4",
+    revieweeId: "s2",
+    rating: 5,
+    text: "Neatly labelled decants, quick to arrive.",
+    createdAt: "2026-10-27T11:00:00Z",
+  },
+  { id: "r5", orderId: "o5", revieweeId: "s2", rating: 5, text: "Great seller.", createdAt: "2026-10-18T16:30:00Z" },
+  { id: "r6", orderId: "o6", revieweeId: "s2", rating: 5, text: "", createdAt: "2026-10-03T08:15:00Z" },
 ];
 
 // The starter catalogue for the sample listings. Guide prices are made-up
