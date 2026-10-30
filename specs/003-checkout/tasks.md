@@ -7,8 +7,8 @@ Built alongside 004. Needs Stripe test keys and the service-role key on this mac
 - [x] `checkout.ts`: `canBuy`, `RESERVATION_MINUTES`, `reservationEndsAt`, `isUkPostcode`, `normalisePostcode`, plus tests (R-3, R-4, R-8, AC-2.1)
 
 ## Database
-- [ ] `NNNN_checkout.sql`: addresses, reservations, `payouts_ready`, the new order columns and unique index, `webhook_events`, `reserve_listing`
-- [ ] Run it on the dev database and check the RLS cases in plan.md
+- [x] `0011_checkout.sql`: addresses, reservations, `payouts_ready`, the new order columns and unique index, `webhook_events`, `reserve_listing`
+- [x] Run it on the dev database and check the RLS cases in plan.md
 
 ## Server and api
 - [ ] `lib/supabase/service.ts` (server-only) and `lib/stripe.ts`

@@ -8,8 +8,8 @@ Built alongside 003. Uses the `fake` shipping provider until the broker is chose
 - [x] `shipping.ts`: `parcelFor` and `royalMailPerfumeProblems`; listing input refuses over 150ml. Tests (R-6, AC-1.2)
 
 ## Database
-- [ ] `NNNN_orders_shipping.sql`: `cancelled` status, deadline columns, drop the manual tracking grant, shipments, tracking events, dispatch postcode, `transition_order`
-- [ ] Run it on the dev database and check the RLS cases in plan.md
+- [x] `0010_orders_shipping.sql` (and `0013_order_access.sql` after the advisor): `cancelled` status, deadline columns, drop the manual tracking grant, shipments, tracking events, dispatch postcode, `transition_order`
+- [x] Run it on the dev database and check the RLS cases in plan.md
 
 ## Server and api
 - [ ] `lib/shipping/` interface and `fake` provider
