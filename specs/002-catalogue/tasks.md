@@ -1,7 +1,7 @@
 # 002: Fragrance catalogue — tasks
 
 ## Core
-- [ ] `catalogue.ts`: `Concentration`, `normaliseName`, `guidePricePerMl`, `guideValuePence`, plus tests for full, partial, decant and no-price cases (R-3, R-4, AC-4)
+- [x] `catalogue.ts`: `Concentration`, `normaliseName`, `guidePricePerMl`, `guideValuePence`, plus tests for full, partial, decant and no-price cases (R-3, R-4, AC-4)
 
 ## Database
 - [ ] `NNNN_catalogue.sql`: pg_trgm; houses, fragrances, sizes, price-change history and its trigger; `fragrance_id` on listings and bottles; RLS; `admin_merge_fragrance`

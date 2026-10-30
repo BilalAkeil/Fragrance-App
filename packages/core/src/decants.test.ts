@@ -63,7 +63,7 @@ describe("decantLabel", () => {
   it("includes batch code and date", () => {
     expect(decantLabel(decant, bottle, "2026-10-25")).toEqual([
       "Creed",
-      "Aventus",
+      "Aventus Eau de Parfum",
       "10ml decant",
       "Batch A4223K01",
       "Decanted 2026-10-25",

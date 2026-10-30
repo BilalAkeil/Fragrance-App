@@ -21,6 +21,8 @@ export interface SourceBottle {
   house: string;
   name: string;
   sizeMl: number;
+  // Set when the bottle is matched to the catalogue (002).
+  fragranceId?: string;
   // Not every bottle has one.
   batchCode?: string;
   videoUrl: string;
@@ -34,6 +36,10 @@ export interface Listing {
   sellerId: string;
   house: string;
   name: string;
+  // Set when the listing is matched to the catalogue (002). Unmatched listings
+  // keep only the house and name the seller typed.
+  fragranceId?: string;
+  houseId?: string;
   kind: ListingKind;
   sizeMl: number;
   // Only meaningful for partial bottles.

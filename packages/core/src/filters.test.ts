@@ -16,6 +16,7 @@ describe("listingFilterFromParams", () => {
         min: "10",
         max: "£150.50",
         certified: "1",
+        house: "h2",
       }),
     ).toEqual({
       query: "oud",
@@ -24,6 +25,7 @@ describe("listingFilterFromParams", () => {
       minPence: 1000,
       maxPence: 15050,
       certifiedOnly: true,
+      houseId: "h2",
     });
   });
 
@@ -50,6 +52,11 @@ describe("matchesFilter", () => {
 
   it("keeps only certified sellers", () => {
     expect(matching({ certifiedOnly: true })).toEqual(["l1", "l2"]);
+  });
+
+  it("filters by catalogue house, leaving out unmatched listings", () => {
+    expect(matching({ houseId: "h3" })).toEqual(["l3"]);
+    expect(matching({ houseId: "h5" })).toEqual([]);
   });
 
   it("searches house, name and notes", () => {
