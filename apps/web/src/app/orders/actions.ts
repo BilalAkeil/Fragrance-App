@@ -64,3 +64,25 @@ export async function submitReview(formData: FormData) {
   revalidatePath(`/orders/${id}`);
   redirect(`/orders/${id}?review=thanks#review`);
 }
+
+// 005 Q-3 (settled: copy Vinted): the seller replies to their review, once.
+// The database allows only the reviewee, only the reply, and only once.
+export async function replyToReview(formData: FormData) {
+  const orderId = String(formData.get("orderId") ?? "");
+  const reviewId = String(formData.get("reviewId") ?? "");
+  const reply = String(formData.get("reply") ?? "").trim();
+  if (!reply || reply.length > REVIEW_TEXT_MAX) redirect(`/orders/${orderId}?review=reply#review`);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/login?next=/orders/${orderId}`);
+  const { data, error } = await supabase.from("reviews").update({ reply }).eq("id", reviewId).select("reviewee_id");
+  if (error || !data?.length) {
+    if (error) console.error(`Replying to review ${reviewId}:`, error);
+    redirect(`/orders/${orderId}?review=closed#review`);
+  }
+  revalidatePath(`/sellers/${user.id}`);
+  revalidatePath(`/orders/${orderId}`);
+  redirect(`/orders/${orderId}?review=replied#review`);
+}

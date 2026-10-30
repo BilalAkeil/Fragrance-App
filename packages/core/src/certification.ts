@@ -2,7 +2,8 @@ import type { Seller } from "./types";
 
 export const CERTIFICATION_RULES = {
   minAverageRating: 4,
-  // Placeholder: how many reviews before the rating rule applies is still open.
+  // 005 Q-1 (settled): 5 reviews before the 4-star rule applies. Vinted has no
+  // certification to copy, so this is ours.
   minReviewsForRating: 5,
 };
 

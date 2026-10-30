@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { REVIEW_WINDOW_DAYS, canReview, isRating, orderEndedAt, reviewWindowEnds } from "./reviews";
+import { REVIEW_WINDOW_DAYS, canReply, canReview, isRating, orderEndedAt, reviewWindowEnds } from "./reviews";
 
 const endedAt = new Date("2026-10-01T12:00:00Z");
 const day = 24 * 60 * 60 * 1000;
@@ -62,5 +62,16 @@ describe("orderEndedAt", () => {
 
   it("is nothing for an order that hasn't ended", () => {
     expect(orderEndedAt({ status: "delivered", completedAt })).toBeUndefined();
+  });
+});
+
+describe("canReply", () => {
+  it("lets the seller reply once", () => {
+    expect(canReply({ revieweeId: "s1" }, "s1")).toBe(true);
+    expect(canReply({ revieweeId: "s1", reply: { text: "Thanks" } }, "s1")).toBe(false);
+  });
+
+  it("doesn't let anyone else reply", () => {
+    expect(canReply({ revieweeId: "s1" }, "b1")).toBe(false);
   });
 });

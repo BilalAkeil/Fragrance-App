@@ -35,7 +35,32 @@ describe("row mapping", () => {
         text: "Good",
         created_at: "2026-10-30T10:00:00Z",
       }),
-    ).toEqual({ id: "r1", orderId: "o1", swapId: undefined, revieweeId: "s1", rating: 4, text: "Good", createdAt: "2026-10-30T10:00:00Z" });
+    ).toEqual({
+      id: "r1",
+      orderId: "o1",
+      swapId: undefined,
+      revieweeId: "s1",
+      rating: 4,
+      text: "Good",
+      createdAt: "2026-10-30T10:00:00Z",
+      reply: undefined,
+    });
+  });
+
+  it("maps the seller's reply", () => {
+    expect(
+      toReview({
+        id: "r1",
+        order_id: "o1",
+        swap_id: null,
+        reviewee_id: "s1",
+        rating: 4,
+        text: "",
+        created_at: "2026-10-30T10:00:00Z",
+        reply: "Thanks!",
+        replied_at: "2026-10-31T10:00:00Z",
+      }).reply,
+    ).toEqual({ text: "Thanks!", at: "2026-10-31T10:00:00Z" });
   });
 
   it("treats a seller with no reviews as zero", () => {

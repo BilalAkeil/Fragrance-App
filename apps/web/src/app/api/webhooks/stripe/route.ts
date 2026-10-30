@@ -1,11 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
-import { syncIdCheck } from "@/lib/identity";
 import { createOrderFromCheckout, releaseReservation, type CheckoutMetadata } from "@/lib/orders";
 import { stripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 
-// Stripe's payment and ID check webhooks (architecture: signature checked, each event
+// Stripe's payment webhooks (architecture: signature checked, each event
 // handled once). Seller account changes are v2 events, on ./accounts.
 // Locally: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`.
 export async function POST(request: NextRequest) {
@@ -37,13 +36,6 @@ export async function POST(request: NextRequest) {
         if (md?.listingId) await releaseReservation(md.listingId, md.buyerId);
         break;
       }
-      // 005 AC-1.2, AC-1.3: the seller's ID check moved on.
-      case "identity.verification_session.processing":
-      case "identity.verification_session.verified":
-      case "identity.verification_session.requires_input":
-      case "identity.verification_session.canceled":
-        await syncIdCheck(event.data.object.id);
-        break;
     }
   } catch (err) {
     // Forget the event so Stripe's retry gets handled.

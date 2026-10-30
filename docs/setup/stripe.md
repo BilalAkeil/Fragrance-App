@@ -41,7 +41,7 @@ stripe login
 Then, whenever you're testing checkout, run this in its own terminal while `npm run dev:web` is running:
 
 ```bash
-stripe listen --forward-to localhost:3000/api/webhooks/stripe --events checkout.session.completed,checkout.session.expired,checkout.session.async_payment_succeeded,identity.verification_session.processing,identity.verification_session.verified,identity.verification_session.requires_input,identity.verification_session.canceled
+stripe listen --forward-to localhost:3000/api/webhooks/stripe --events checkout.session.completed,checkout.session.expired,checkout.session.async_payment_succeeded
 ```
 
 Seller account changes arrive as v2 events, which need their own forwarding. Run this too, in another terminal:
@@ -52,19 +52,7 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe/accounts --events 
 
 The first time, it prints a webhook signing secret starting `whsec_`. Add it to `apps/web/.env.local` as `STRIPE_WEBHOOK_SECRET=whsec_...`. It stays the same for your machine, so you only do this once. Each of us has our own.
 
-## 5. The ID check (005)
-
-Sellers verify their ID with Stripe Identity before they list. The date of birth, which the 18+ check needs, is sensitive, so Stripe only gives it to a restricted key:
-
-1. In the Dashboard (test mode), go to Developers > API keys > **Create restricted key**.
-2. Name it "Identity results", and set **Identity Verification Results** and **Recent Detailed Verification Results** to **Read**. Nothing else.
-3. Add it to `apps/web/.env.local` as `STRIPE_IDENTITY_RESULTS_KEY=rk_test_...`. Server only, never committed.
-
-Without it, development verifies people without checking their age and logs a warning. Production refuses to verify anyone until it's set.
-
-Stripe's test page for the check lets you pick the outcome: success, failure, or the async versions (which show "Checking…" first). A restricted key without IP restrictions can only read results from the last 48 hours, which is fine: we read them as the webhook arrives.
-
-## 6. Test cards
+## 5. Test cards
 
 | Card | What happens |
 | --- | --- |
@@ -74,4 +62,4 @@ Stripe's test page for the check lets you pick the outcome: success, failure, or
 
 Any future expiry date, any CVC, and any UK postcode.
 
-When you test a seller's payout setup, Stripe's test onboarding accepts fake details. Use sort code `108800` and account number `00012345`. For the identity steps, choose the "use test data" options Stripe offers.
+When you test a seller's payout setup, Stripe's test onboarding accepts fake details. Use sort code `108800` and account number `00012345`. For the identity steps, choose the "use test data" options Stripe offers. Payout setup is also the seller's ID check (005): once it's done and they're 18 or over, they can list.

@@ -2,9 +2,9 @@ import type { Order, OrderStatus } from "./orders";
 
 // Reviews after an order or swap (spec 005, US-2 and US-3).
 
-// Q-3 assumption (plan): a review can be left up to 30 days after the order
-// ends. Placeholder until Q-3 is settled. The database's insert policy uses the same number.
-export const REVIEW_WINDOW_DAYS = 30;
+// Q-3 (settled: copy Vinted): a review can be left up to 4 days after the order
+// ends. The database's insert policy uses the same number.
+export const REVIEW_WINDOW_DAYS = 4;
 
 export type Rating = 1 | 2 | 3 | 4 | 5;
 
@@ -12,7 +12,7 @@ export function isRating(n: number): n is Rating {
   return Number.isInteger(n) && n >= 1 && n <= 5;
 }
 
-// The most a review's text can say. The database checks the same limit.
+// The most a review or a reply can say. The database checks the same limit.
 export const REVIEW_TEXT_MAX = 1000;
 
 // When the review window closes for an order that ended at `endedAt`.
@@ -38,4 +38,9 @@ export function canReview(order: {
 export function orderEndedAt(order: Pick<Order, "status" | "completedAt" | "refundedAt">): Date | undefined {
   const at = order.status === "completed" ? order.completedAt : order.status === "refunded" ? order.refundedAt : undefined;
   return at ? new Date(at) : undefined;
+}
+
+// Q-3 (settled: copy Vinted): the person reviewed can reply, once.
+export function canReply(review: { revieweeId: string; reply?: unknown }, userId: string): boolean {
+  return review.revieweeId === userId && !review.reply;
 }

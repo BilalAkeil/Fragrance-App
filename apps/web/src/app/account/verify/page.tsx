@@ -6,17 +6,17 @@ import { buttonPrimary, buttonSecondary, pageTitle, panel } from "@/components/u
 import { stripeConfigured } from "@/lib/stripe";
 import { supabaseConfigured } from "@/lib/supabase/config";
 import { getCurrentSeller } from "@/lib/supabase/server";
-import { startIdCheck } from "./actions";
+import { startPayoutSetup } from "../payouts/actions";
 
 export const dynamic = "force-dynamic";
 
-// 005 US-1: "Verify your ID", before someone's first listing or swap.
-export default async function VerifyPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+// 005 US-1: "Verify your ID", before someone's first listing or swap. The check
+// is Stripe's, as part of setting up payouts (Q-5, settled: copy Vinted).
+export default async function VerifyPage() {
   if (!supabaseConfigured) return <NotConnected />;
   const { supabase, user, seller } = await getCurrentSeller();
   if (!user) redirect("/login?next=/account/verify");
   if (!seller) redirect("/account");
-  const { error } = await searchParams;
 
   const { data: check } = await supabase
     .from("id_checks")
@@ -36,9 +36,6 @@ export default async function VerifyPage({ searchParams }: { searchParams: Promi
         </Link>
         <h1 className={pageTitle}>Verify your ID</h1>
       </div>
-      {error === "start" && (
-        <p className="text-sm text-danger">Stripe couldn&apos;t start the check. Please try again in a few minutes.</p>
-      )}
       <IdCheckPanel outcome={outcome} />
     </div>
   );
@@ -64,12 +61,13 @@ function IdCheckPanel({ outcome }: { outcome: IdCheckOutcome }) {
     case "in_progress":
       return (
         <section className={`${panel} flex flex-col gap-4`}>
-          <h2 className="text-lg font-extrabold">We&apos;re checking your ID</h2>
+          <h2 className="text-lg font-extrabold">Stripe is checking your details</h2>
           <p className="text-sm text-muted">
-            This usually takes a minute or two. You can leave this page: your account shows the result when it&apos;s
-            done.
+            If you didn&apos;t finish, carry on where you left off. Otherwise this usually takes a few minutes, and your
+            account shows the result when it&apos;s done.
           </p>
-          <div>
+          <div className="flex flex-wrap gap-3">
+            <StartButton label="Carry on with Stripe" />
             <Link href="/account/verify" className={buttonSecondary}>
               Check again
             </Link>
@@ -81,10 +79,10 @@ function IdCheckPanel({ outcome }: { outcome: IdCheckOutcome }) {
       return (
         <section className={`${panel} flex flex-col gap-4`}>
           <h2 className="text-lg font-extrabold">
-            {outcome.screen === "failed" ? "We couldn't verify your ID" : "Stripe needs more information"}
+            {outcome.screen === "failed" ? "We can't verify your ID" : "Stripe needs more information"}
           </h2>
           <p className="text-sm">{outcome.message}</p>
-          {outcome.canRetry ? <StartButton label="Try again" /> : <p className="text-sm text-muted">If you think this is wrong, contact us.</p>}
+          {outcome.canRetry ? <StartButton label="Carry on with Stripe" /> : <p className="text-sm text-muted">If you think this is wrong, contact us.</p>}
         </section>
       );
     case "not_started":
@@ -97,12 +95,13 @@ function IdCheckPanel({ outcome }: { outcome: IdCheckOutcome }) {
               they&apos;re dealing with a real person. It helps keep fakes and scammers out.
             </li>
             <li>
-              <span className="font-bold">How long it takes:</span> a few minutes. You&apos;ll need a passport, driving
-              licence or national ID card, and your phone&apos;s camera for a selfie.
+              <span className="font-bold">How it works:</span> our payments partner, Stripe, checks who you are while you
+              set up payouts, so you do both at once. It takes a few minutes. Have your bank details ready, and Stripe may
+              ask for a photo of your passport or driving licence.
             </li>
             <li>
-              <span className="font-bold">Your document:</span> the check is done by our payments partner, Stripe. We
-              don&apos;t keep a copy of your document or selfie, only whether the check passed.
+              <span className="font-bold">Your documents:</span> Stripe keeps them. We don&apos;t keep a copy, only
+              whether the check passed.
             </li>
             <li>You must be 18 or over. Buying never needs an ID check.</li>
           </ul>
@@ -117,7 +116,7 @@ function StartButton({ label }: { label: string }) {
     return <p className="text-sm text-muted">The ID check needs the Stripe keys, which aren&apos;t set on this site yet.</p>;
   }
   return (
-    <form action={startIdCheck}>
+    <form action={startPayoutSetup}>
       <button className={buttonPrimary}>{label}</button>
     </form>
   );

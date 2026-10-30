@@ -71,7 +71,12 @@ export default async function SellerProfilePage({
       </section>
 
       <section id="reviews" className="flex max-w-3xl flex-col gap-4">
-        <h2 className="text-xl font-extrabold">Reviews</h2>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-xl font-extrabold">Reviews</h2>
+          <Link href="/reviews-policy" className="text-sm font-bold text-brand underline">
+            How reviews work
+          </Link>
+        </div>
         {reviews.length > 0 ? (
           <ul className="flex flex-col gap-3">
             {reviews.map((r) => (
@@ -113,6 +118,12 @@ function ReviewItem({ review }: { review: Review }) {
       </div>
       {review.text && <p className="text-sm">{review.text}</p>}
       <p className="text-xs text-muted">{review.swapId ? "After a swap" : "Verified purchase"}</p>
+      {review.reply && (
+        <div className="mt-1 rounded-xl bg-panel p-3 text-sm">
+          <p className="font-bold">Seller&apos;s reply · {date(review.reply.at)}</p>
+          <p>{review.reply.text}</p>
+        </div>
+      )}
     </li>
   );
 }

@@ -51,6 +51,7 @@ export const sampleReviews: Review[] = [
     rating: 4,
     text: "Genuine and as described. Took a few days to send.",
     createdAt: "2026-10-12T09:05:00Z",
+    reply: { text: "Thanks, and sorry for the wait. I was away that week.", at: "2026-10-12T18:00:00Z" },
   },
   { id: "r3", orderId: "o3", revieweeId: "s1", rating: 5, text: "", createdAt: "2026-09-30T14:40:00Z" },
   {

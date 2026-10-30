@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { UNDER_AGE_CODE, idCheckOutcome, isAdult } from "./identity";
+import { UNDER_AGE_CODE, idCheckOutcome, idCheckStatus, isAdult } from "./identity";
 
 describe("isAdult", () => {
   const now = new Date("2026-10-30T12:00:00Z");
@@ -28,41 +28,54 @@ describe("isAdult", () => {
   });
 });
 
+describe("idCheckStatus", () => {
+  const now = new Date("2026-10-30T12:00:00Z");
+  const adult = { day: 1, month: 1, year: 1990 };
+
+  it("follows payout setup until it's done", () => {
+    expect(idCheckStatus("not_started", undefined, now).status).toBe("not_started");
+    expect(idCheckStatus("in_progress", undefined, now).status).toBe("pending");
+    expect(idCheckStatus("needs_info", adult, now).status).toBe("needs_input");
+  });
+
+  it("verifies an adult once payouts are ready", () => {
+    expect(idCheckStatus("ready", adult, now)).toEqual({ status: "verified", errorCode: null });
+  });
+
+  it("refuses someone under 18 even when Stripe is happy", () => {
+    expect(idCheckStatus("ready", { day: 31, month: 10, year: 2008 }, now)).toEqual({
+      status: "needs_input",
+      errorCode: UNDER_AGE_CODE,
+    });
+  });
+
+  it("waits when the date of birth isn't there yet", () => {
+    expect(idCheckStatus("ready", undefined, now).status).toBe("pending");
+  });
+});
+
 describe("idCheckOutcome", () => {
   it("shows the start screen before a check", () => {
     expect(idCheckOutcome("not_started")).toEqual({ screen: "not_started", canRetry: true });
   });
 
-  it("shows checking while Stripe works", () => {
-    expect(idCheckOutcome("pending").screen).toBe("in_progress");
+  it("shows in progress, with a way to carry on", () => {
+    expect(idCheckOutcome("pending")).toEqual({ screen: "in_progress", canRetry: true });
   });
 
   it("shows verified", () => {
     expect(idCheckOutcome("verified")).toEqual({ screen: "verified", canRetry: false });
   });
 
-  it("asks for more information when the person can fix it", () => {
-    const outcome = idCheckOutcome("needs_input", "document_expired");
-    expect(outcome.screen).toBe("needs_input");
-    expect(outcome.message).toMatch(/expired/);
-    expect(outcome.canRetry).toBe(true);
-  });
-
-  it("has a fallback message for reasons it doesn't know", () => {
-    expect(idCheckOutcome("needs_input", "something_new")).toMatchObject({ screen: "needs_input", canRetry: true });
-    expect(idCheckOutcome("needs_input", null).message).toBeTruthy();
-  });
-
-  it("fails when the document or selfie didn't pass, but allows another try", () => {
-    expect(idCheckOutcome("needs_input", "selfie_face_mismatch")).toMatchObject({ screen: "failed", canRetry: true });
+  it("asks for more information", () => {
+    expect(idCheckOutcome("needs_input")).toMatchObject({ screen: "needs_input", canRetry: true });
   });
 
   it("fails without another try for someone under 18", () => {
-    expect(idCheckOutcome("needs_input", UNDER_AGE_CODE)).toMatchObject({
+    expect(idCheckOutcome("needs_input", UNDER_AGE_CODE)).toEqual({
       screen: "failed",
       message: "You must be 18 or over to sell or swap.",
       canRetry: false,
     });
-    expect(idCheckOutcome("needs_input", "under_supported_age")).toMatchObject({ screen: "failed", canRetry: false });
   });
 });

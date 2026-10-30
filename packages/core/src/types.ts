@@ -75,4 +75,6 @@ export interface Review {
   rating: 1 | 2 | 3 | 4 | 5;
   text: string;
   createdAt: string;
+  // The reviewed seller's one reply (005 Q-3).
+  reply?: { text: string; at: string };
 }

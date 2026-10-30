@@ -18,9 +18,11 @@ export interface ReviewRow {
   rating: number;
   text: string;
   created_at: string;
+  reply?: string | null;
+  replied_at?: string | null;
 }
 
-export const REVIEW_COLUMNS = "id, order_id, swap_id, reviewee_id, rating, text, created_at";
+export const REVIEW_COLUMNS = "id, order_id, swap_id, reviewee_id, rating, text, created_at, reply, replied_at";
 
 export interface SellerRatingRow {
   seller_id: string;
@@ -109,6 +111,7 @@ export function toReview(row: ReviewRow): Review {
     rating: row.rating as Review["rating"],
     text: row.text,
     createdAt: row.created_at,
+    reply: row.reply && row.replied_at ? { text: row.reply, at: row.replied_at } : undefined,
   };
 }
 

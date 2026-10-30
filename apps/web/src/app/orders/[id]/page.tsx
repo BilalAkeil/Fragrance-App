@@ -24,7 +24,7 @@ import { buttonPrimary, buttonSecondary, pageTitle, panel } from "@/components/u
 import { marketplace } from "@/lib/marketplace";
 import { supabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
-import { confirmEverythingOk, submitReview } from "../actions";
+import { confirmEverythingOk, replyToReview, submitReview } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -220,7 +220,8 @@ function NextStep({
 const REVIEW_NOTICES: Record<string, string> = {
   rating: "Choose a rating from 1 to 5 stars.",
   long: `Keep your review to ${REVIEW_TEXT_MAX} characters.`,
-  closed: "This order can't be reviewed any more.",
+  closed: "That can't be done on this review.",
+  reply: `Write a reply of up to ${REVIEW_TEXT_MAX} characters.`,
   error: "Your review couldn't be saved. Please try again.",
 };
 
@@ -253,6 +254,26 @@ function ReviewSection({
           {stars(review.rating)}
         </p>
         {review.text && <p className="text-sm">{review.text}</p>}
+        {review.reply && (
+          <div className="mt-1 rounded-xl bg-panel p-3 text-sm">
+            <p className="font-bold">{role === "seller" ? "Your reply" : "The seller's reply"}</p>
+            <p>{review.reply.text}</p>
+          </div>
+        )}
+        {role === "seller" && !review.reply && (
+          <form action={replyToReview} className="mt-2 flex flex-col gap-2">
+            <input type="hidden" name="orderId" value={order.id} />
+            <input type="hidden" name="reviewId" value={review.id} />
+            <label className="flex flex-col gap-1 text-sm font-bold">
+              Reply (optional, once, shown on your profile)
+              <textarea name="reply" rows={2} required maxLength={REVIEW_TEXT_MAX} className={`${inputClass} font-normal`} />
+            </label>
+            {notice && REVIEW_NOTICES[notice] && <p className="text-sm text-danger">{REVIEW_NOTICES[notice]}</p>}
+            <div>
+              <button className={buttonSecondary}>Post reply</button>
+            </div>
+          </form>
+        )}
         {role === "buyer" && notice === "thanks" && (
           <p className="text-sm text-muted">
             It&apos;s on the seller&apos;s{" "}
@@ -279,7 +300,11 @@ function ReviewSection({
       <div>
         <h2 className="text-lg font-extrabold">How was the seller?</h2>
         <p className="text-sm text-muted">
-          Your review goes on their public profile. You can leave one until {day(reviewWindowEnds(endedAt).toISOString())}.
+          Your review goes on their public profile, with the date. You can leave one until{" "}
+          {when(reviewWindowEnds(endedAt).toISOString())}.{" "}
+          <Link href="/reviews-policy" className="font-bold text-brand underline">
+            How reviews work
+          </Link>
         </p>
       </div>
       <form action={submitReview} className="flex flex-col gap-4">

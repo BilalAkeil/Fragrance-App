@@ -1,6 +1,6 @@
 // The ID check before someone lists or swaps (spec 005, US-1).
 
-// Q-6 assumption (plan): only adults can sell or swap. Placeholder until Q-6 is settled.
+// Q-6 (settled: copy Vinted): only adults, 18 or over, can sell or swap.
 export const MIN_SELLER_AGE = 18;
 
 // What the database records about a seller's check. Set only by server code.
@@ -44,45 +44,36 @@ export interface IdCheckOutcome {
   canRetry: boolean;
 }
 
-// Stripe Identity's reasons a check couldn't be completed. The person can fix
-// these themselves, so they need more information rather than failing.
-const NEEDS_INPUT_MESSAGES: Record<string, string> = {
-  abandoned: "You left the check before it finished. Start again when you're ready.",
-  country_not_supported: "That document's country isn't supported. Try again with a passport.",
-  consent_declined: "You didn't agree to the check. We need it before you can list.",
-  device_not_supported: "Your device couldn't take the photos. Try again on a phone with a camera.",
-  document_expired: "That document has expired. Try again with one that's in date.",
-  document_type_not_supported: "That type of document isn't accepted. Use a passport, driving licence or national ID card.",
-  selfie_document_missing_photo: "We couldn't find a photo on your document. Try again with a photo ID.",
-};
-
-// Reasons the check itself failed: the document or selfie didn't pass.
-const FAILED_MESSAGES: Record<string, string> = {
-  document_unverified_other: "We couldn't verify your document. Check the photos are clear and try again.",
-  selfie_face_mismatch: "Your selfie didn't match the photo on your document. Try again in good light.",
-  selfie_manipulated: "Your selfie couldn't be checked. Try again with a live photo of yourself.",
-  selfie_unverified_other: "We couldn't verify your selfie. Try again in good light.",
-  [UNDER_AGE_CODE]: `You must be ${MIN_SELLER_AGE} or over to sell or swap.`,
-  // Stripe's own age floor, below ours.
-  under_supported_age: `You must be ${MIN_SELLER_AGE} or over to sell or swap.`,
-};
-
-// Codes where trying again can't help.
-const FINAL_CODES = new Set([UNDER_AGE_CODE, "under_supported_age"]);
-
-const GENERIC_NEEDS_INPUT = "Stripe needs a bit more information to finish the check. Try again.";
+// Q-5 (settled: copy Vinted): the ID check is the one Stripe does when a seller
+// sets up payouts, as Vinted's payments provider does. `payoutStatus` is how far
+// that has got.
+export function idCheckStatus(
+  payoutStatus: "not_started" | "in_progress" | "needs_info" | "ready",
+  dob: DateOfBirth | undefined,
+  now: Date,
+): { status: IdCheckStatus; errorCode: string | null } {
+  if (payoutStatus === "not_started") return { status: "not_started", errorCode: null };
+  if (payoutStatus === "in_progress") return { status: "pending", errorCode: null };
+  if (payoutStatus === "needs_info") return { status: "needs_input", errorCode: null };
+  if (!dob) return { status: "pending", errorCode: null };
+  if (!isAdult(dob, now)) return { status: "needs_input", errorCode: UNDER_AGE_CODE };
+  return { status: "verified", errorCode: null };
+}
 
 // What to show for a seller's check (AC-1.2, AC-1.3).
 export function idCheckOutcome(status: IdCheckStatus, errorCode?: string | null): IdCheckOutcome {
   if (status === "verified") return { screen: "verified", canRetry: false };
-  if (status === "pending") return { screen: "in_progress", canRetry: false };
+  if (status === "pending") return { screen: "in_progress", canRetry: true };
   if (status === "needs_input") {
-    const code = errorCode ?? "";
-    if (code in FAILED_MESSAGES) {
+    if (errorCode === UNDER_AGE_CODE) {
       // Trying again can't change someone's age.
-      return { screen: "failed", message: FAILED_MESSAGES[code], canRetry: !FINAL_CODES.has(code) };
+      return { screen: "failed", message: `You must be ${MIN_SELLER_AGE} or over to sell or swap.`, canRetry: false };
     }
-    return { screen: "needs_input", message: NEEDS_INPUT_MESSAGES[code] ?? GENERIC_NEEDS_INPUT, canRetry: true };
+    return {
+      screen: "needs_input",
+      message: "Stripe needs a bit more information to confirm who you are. Carry on where you left off.",
+      canRetry: true,
+    };
   }
   return { screen: "not_started", canRetry: true };
 }
