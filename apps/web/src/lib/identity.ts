@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import type Stripe from "stripe";
 import { UNDER_AGE_CODE, isAdult, type IdCheckStatus } from "@fragrance/core";
-import { stripe } from "@/lib/stripe";
+import { stripe, stripeIdentityResults } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getCurrentSeller } from "@/lib/supabase/server";
 
@@ -39,17 +39,19 @@ export async function createIdCheck(sellerId: string, email: string | undefined,
   return session.url;
 }
 
-// What a session means for the seller.
-function checkFromSession(session: Stripe.Identity.VerificationSession, now = new Date()): {
-  status: IdCheckStatus;
-  errorCode: string | null;
-} {
+// What a session means for the seller. `dob` is undefined when it wasn't read
+// (development without the results key).
+function checkFromSession(
+  session: Stripe.Identity.VerificationSession,
+  dob: Stripe.Identity.VerificationSession.VerifiedOutputs.Dob | null | undefined,
+  now = new Date(),
+): { status: IdCheckStatus; errorCode: string | null } {
   switch (session.status) {
     case "processing":
       return { status: "pending", errorCode: null };
     case "verified": {
+      if (dob === undefined) return { status: "verified", errorCode: null };
       // Q-6 (plan): 18 or over, from the date of birth on their document.
-      const dob = session.verified_outputs?.dob;
       if (!dob?.day || !dob.month || !dob.year) return { status: "needs_input", errorCode: "dob_missing" };
       if (!isAdult({ day: dob.day, month: dob.month, year: dob.year }, now)) {
         return { status: "needs_input", errorCode: UNDER_AGE_CODE };
@@ -67,6 +69,22 @@ function checkFromSession(session: Stripe.Identity.VerificationSession, now = ne
   }
 }
 
+// The date of birth from a verified session. Only a restricted key can read it
+// (docs/setup/stripe.md). Without one, development skips the age check and
+// production refuses, so the webhook is retried once the key is set.
+async function verifiedDob(sessionId: string) {
+  const client = stripeIdentityResults();
+  if (!client) {
+    if (process.env.NODE_ENV === "production") throw new Error("STRIPE_IDENTITY_RESULTS_KEY isn't set");
+    console.warn(`ID check ${sessionId}: age not checked, because STRIPE_IDENTITY_RESULTS_KEY isn't set`);
+    return undefined;
+  }
+  const session = await client.identity.verificationSessions.retrieve(sessionId, {
+    expand: ["verified_outputs", "verified_outputs.dob"],
+  });
+  return session.verified_outputs?.dob ?? null;
+}
+
 // The Identity webhooks and the return page: reads the session from Stripe and
 // records the outcome, so events arriving late or out of order do no harm.
 // Only the seller's latest session counts.
@@ -81,8 +99,9 @@ export async function syncIdCheck(sessionId: string): Promise<IdCheckStatus | un
   // Verified is final for a session.
   if (check.status === "verified") return "verified";
 
-  const session = await stripe().identity.verificationSessions.retrieve(sessionId, { expand: ["verified_outputs"] });
-  const { status, errorCode } = checkFromSession(session);
+  const session = await stripe().identity.verificationSessions.retrieve(sessionId);
+  const dob = session.status === "verified" ? await verifiedDob(sessionId) : undefined;
+  const { status, errorCode } = checkFromSession(session, dob);
   const { error } = await db
     .from("id_checks")
     .update({ status, error_code: errorCode, updated_at: new Date().toISOString() })

@@ -93,6 +93,7 @@ Every upload goes in a folder named after the uploader's user id, as `lib/upload
 | `SUPABASE_SERVICE_ROLE_KEY` | Web server only | 003 |
 | `NEXT_PUBLIC_SITE_URL` | Web | 003 |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Web | 005 (Identity), 003 |
+| `STRIPE_IDENTITY_RESULTS_KEY` (restricted: Identity results, read only) | Web server only | 005 |
 | `SHIPPING_PROVIDER` and that provider's keys | Web server only | 004 |
 | `CRON_SECRET` | Web server only | 004 |
 | `EMAIL_PROVIDER` and that provider's key | Web server only | 010 |
