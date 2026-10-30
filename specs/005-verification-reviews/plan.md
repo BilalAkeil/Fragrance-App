@@ -74,3 +74,15 @@ How we'll build [spec.md](spec.md). Shared design: [docs/architecture.md](../../
 
 - **Identity's cost** is per verification. Check the price before launch.
 - **If 005 Q-5 picks the Connect ID check instead,** only `startIdCheck` and the webhook change.
+
+## Changes while building
+
+- **The ID check's status lives in a new `id_checks` table** (`0015`), not on `sellers`. Everyone can read `sellers`, and the check's state and reason are only for the seller and admins. It has no write policies or grants: only server code writes it.
+- **Reading the date of birth needs a restricted Stripe key.** Stripe only returns `verified_outputs.dob` to a restricted key with the Identity results permission, so the 18+ check (Q-6) uses `STRIPE_IDENTITY_RESULTS_KEY` (see `docs/setup/stripe.md`). Without it, development verifies people without checking their age and logs a warning; production refuses until it's set.
+- **The webhook and the return page both read the session from Stripe** (`syncIdCheck`) rather than trusting the event, so late or out-of-order events do no harm, and the return page moves on even if the webhook is slow.
+- **Under 18 shows as "We couldn't verify your ID"** with no Try again, since trying again can't change it. The status in the database is still `needs_input`, with the reason `under_age`. The other outcomes map to "needs more information" or "failed" in `idCheckOutcome` in core.
+- **`reviews.seller_id` is renamed `reviewee_id`** rather than adding a second column, and `reviewer_id` defaults to the signed-in user and isn't in the insert grant. `seller_ratings` keeps its columns and now runs as the reader (`security_invoker`), which also clears the security advisor's error.
+- **`orders.refunded_at`** (`0016`) is set by `transition_order`, so a review after a refund (AC-2.3) has a window to count from.
+- **Reviews don't show who wrote them,** only "Verified purchase" or "After a swap". Buyers have no public name yet.
+- **`ListingCard`** is now its own component, with the seller's name outside the card's link so it can link to their profile.
+- **The orders list** still shows the seller's name as plain text, because each row is already a link to the order. The order page links to the seller.

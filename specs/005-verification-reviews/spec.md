@@ -71,7 +71,7 @@ Trust is what we sell. Bilal's decisions put it like this. Everyone verifies the
 
 ## Data
 
-- **Sellers:** `id_verified` exists. Add the ID check's status (not started, pending, verified, needs input) and the Stripe reference. Only server code writes these.
+- **Sellers:** `id_verified` exists. Each seller's ID check also has a status (not started, pending, verified, needs input), the reason it needs input, and the Stripe reference. Only the seller and admins can see these, and only server code writes them.
 - **Reviews:** keep one per order. Add an optional swap link, so a swap side can be reviewed, and record who wrote each review. Tighten today's rule ("delivered or completed") to completed orders only.
 - **The rating view:** `seller_ratings` stays, and counts swap reviews too unless Q-2 decides otherwise.
 
