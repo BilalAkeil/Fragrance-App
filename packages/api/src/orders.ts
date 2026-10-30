@@ -1,5 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { DeliveryService, ListingKind, Order, OrderStatus, ShipToAddress, TrackingEvent } from "@fragrance/core";
+import type {
+  DeliveryService,
+  ListingKind,
+  Order,
+  OrderStatus,
+  Review,
+  ShipToAddress,
+  TrackingEvent,
+} from "@fragrance/core";
+import { REVIEW_COLUMNS, toReview, type ReviewRow } from "./rows";
 
 // Reads for the order screens (004) and checkout (003). They take the signed-in
 // user's own client, so RLS decides what comes back: an order only to its
@@ -23,6 +32,7 @@ export interface OrderRow {
   complete_after: string | null;
   completed_at: string | null;
   cancelled_at: string | null;
+  refunded_at?: string | null;
   listings: {
     house: string;
     name: string;
@@ -34,7 +44,7 @@ export interface OrderRow {
 }
 
 export const ORDER_COLUMNS =
-  "id, listing_id, buyer_id, seller_id, status, item_pence, postage_pence, protection_fee_pence, delivery_service, ship_to, created_at, ship_by, shipped_at, delivered_at, complete_after, completed_at, cancelled_at, listings(house, name, kind, size_ml, listing_photos(path, position)), shipments(tracking_ref, tracking_events(at, status, description))";
+  "id, listing_id, buyer_id, seller_id, status, item_pence, postage_pence, protection_fee_pence, delivery_service, ship_to, created_at, ship_by, shipped_at, delivered_at, complete_after, completed_at, cancelled_at, refunded_at, listings(house, name, kind, size_ml, listing_photos(path, position)), shipments(tracking_ref, tracking_events(at, status, description))";
 
 export function toOrder(row: OrderRow, photoUrl: (path: string) => string = (p) => p): Order {
   const photo = [...(row.listings?.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0];
@@ -65,6 +75,7 @@ export function toOrder(row: OrderRow, photoUrl: (path: string) => string = (p) 
     completeAfter: row.complete_after ?? undefined,
     completedAt: row.completed_at ?? undefined,
     cancelledAt: row.cancelled_at ?? undefined,
+    refundedAt: row.refunded_at ?? undefined,
   };
 }
 
@@ -100,4 +111,11 @@ export async function getAddresses(client: SupabaseClient): Promise<SavedAddress
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []).map((a) => ({ ...a, line2: a.line2 ?? undefined }));
+}
+
+// 005 AC-2.1: the review left on an order, if any. Reviews are public.
+export async function getOrderReview(client: SupabaseClient, orderId: string): Promise<Review | undefined> {
+  const { data, error } = await client.from("reviews").select(REVIEW_COLUMNS).eq("order_id", orderId).maybeSingle();
+  if (error) throw error;
+  return data ? toReview(data as ReviewRow) : undefined;
 }

@@ -50,3 +50,24 @@ describe("sampleMarketplace catalogue", () => {
     expect(await sampleMarketplace.getGuideValue(byId("l5"))).toBeUndefined();
   });
 });
+
+describe("sampleMarketplace.getSellerProfile", () => {
+  it("returns the seller, their active listings and reviews newest first", async () => {
+    const profile = await sampleMarketplace.getSellerProfile("s1");
+    expect(profile?.seller.displayName).toBe("ScentShelf");
+    expect(profile?.listings.every((l) => l.sellerId === "s1" && l.status === "active")).toBe(true);
+    const dates = profile?.reviews.map((r) => r.createdAt) ?? [];
+    expect(dates.length).toBeGreaterThan(0);
+    expect([...dates].sort().reverse()).toEqual(dates);
+  });
+
+  it("has the empty states for a seller with no reviews", async () => {
+    const profile = await sampleMarketplace.getSellerProfile("s3");
+    expect(profile?.reviews).toEqual([]);
+    expect(profile?.hasMore).toBe(false);
+  });
+
+  it("returns nothing for an unknown seller", async () => {
+    expect(await sampleMarketplace.getSellerProfile("nobody")).toBeUndefined();
+  });
+});

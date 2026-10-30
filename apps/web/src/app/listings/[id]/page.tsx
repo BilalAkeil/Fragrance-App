@@ -4,6 +4,7 @@ import { batchCodeLabel, checkoutBreakdown, formatGBP, hasVerifiedSource, parcel
 import { BottleTile } from "@/components/BottleTile";
 import { CONDITION_LABELS, KIND_LABELS } from "@/components/labels";
 import { SellerBadge } from "@/components/SellerBadge";
+import { SellerLink } from "@/components/SellerLink";
 import { panel } from "@/components/ui";
 import { marketplace } from "@/lib/marketplace";
 import { shippingProvider } from "@/lib/shipping";
@@ -105,7 +106,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             </span>
             <span className="flex flex-col gap-1">
               <span className="flex flex-wrap items-center gap-2">
-                <span className="font-extrabold">{seller.displayName}</span>
+                <SellerLink seller={seller} className="font-extrabold text-ink hover:text-brand hover:underline" />
                 <SellerBadge seller={seller} />
               </span>
               <span className="text-sm text-muted">

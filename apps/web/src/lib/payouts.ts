@@ -1,9 +1,10 @@
 import "server-only";
 import type Stripe from "stripe";
+import { idCheckStatus } from "@fragrance/core";
 import { stripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 
-// Seller payouts through Stripe Connect (003 AC-3.1), with Accounts v2: each
+// Seller payouts and the ID check (003 AC-3.1, 005 Q-5) through Stripe Connect, with Accounts v2: each
 // seller is a "recipient" account with the Express Dashboard. The platform
 // takes the payment and transfers the item price later (separate charges and
 // transfers), so it pays Stripe's fees and covers losses, as Stripe requires
@@ -21,7 +22,7 @@ export const PAYOUT_STATUS_TEXT: Record<PayoutStatus, string> = {
 };
 
 // Fields a v2 account only returns when asked for.
-const INCLUDE: Stripe.V2.Core.AccountRetrieveParams.Include[] = ["configuration.recipient", "requirements"];
+const INCLUDE: Stripe.V2.Core.AccountRetrieveParams.Include[] = ["configuration.recipient", "requirements", "identity"];
 
 export function payoutStatus(account: Account | undefined): PayoutStatus {
   if (!account) return "not_started";
@@ -35,14 +36,42 @@ export async function retrievePayoutAccount(accountId: string): Promise<Account>
   return stripe().v2.core.accounts.retrieve(accountId, { include: INCLUDE });
 }
 
-// The account webhooks, and the return from onboarding: only server code sets payouts_ready.
-export async function syncPayoutsReady(accountId: string) {
-  const ready = payoutStatus(await retrievePayoutAccount(accountId)) === "ready";
-  const { error } = await createServiceClient()
+// The account webhooks, and the return from onboarding. Only server code sets
+// payouts_ready and id_verified (R-1). 005 Q-5 (settled: copy Vinted): the ID
+// check is the one Stripe does here, plus our 18+ rule (Q-6) on the date of
+// birth Stripe verified.
+export async function syncSellerAccount(accountId: string) {
+  const account = await retrievePayoutAccount(accountId);
+  const payouts = payoutStatus(account);
+  const dob = account.identity?.individual?.date_of_birth;
+  const check = idCheckStatus(payouts, dob ?? undefined, new Date());
+
+  const db = createServiceClient();
+  const { data: seller, error } = await db
     .from("sellers")
-    .update({ payouts_ready: ready })
-    .eq("stripe_account_id", accountId);
+    .update({ payouts_ready: payouts === "ready" })
+    .eq("stripe_account_id", accountId)
+    .select("id, id_verified")
+    .maybeSingle();
   if (error) throw new Error(`Updating payouts for ${accountId}: ${error.message}`);
+  if (!seller) return;
+
+  // An admin may have verified someone by hand (009), so only a pass or the
+  // age rule changes id_verified.
+  if (check.status === "verified" || check.errorCode) {
+    const { error: idError } = await db
+      .from("sellers")
+      .update({ id_verified: check.status === "verified" })
+      .eq("id", seller.id);
+    if (idError) throw new Error(`Verifying seller ${seller.id}: ${idError.message}`);
+  }
+  const { error: checkError } = await db.from("id_checks").upsert({
+    seller_id: seller.id,
+    status: check.status,
+    error_code: check.errorCode,
+    updated_at: new Date().toISOString(),
+  });
+  if (checkError) throw new Error(`Saving the ID check for ${seller.id}: ${checkError.message}`);
 }
 
 // The seller's account, made the first time they set up payouts.

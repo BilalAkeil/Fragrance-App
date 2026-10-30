@@ -110,6 +110,8 @@ export interface Order {
   completeAfter?: string;
   completedAt?: string;
   cancelledAt?: string;
+  // After a dispute (008). Starts the review window too (005 AC-2.3).
+  refundedAt?: string;
 }
 
 // AC-5.1: what happens next on an order, from one side's point of view.

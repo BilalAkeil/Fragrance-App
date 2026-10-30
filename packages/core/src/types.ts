@@ -15,6 +15,8 @@ export interface Seller {
   averageRating: number;
   // 003 AC-3.1: set once Stripe can pay them. Their listings can't be bought before.
   payoutsReady: boolean;
+  // When they made their seller profile (005 AC-4.1).
+  joinedAt?: string;
 }
 
 export interface SourceBottle {
@@ -62,11 +64,17 @@ export interface Listing {
   reservedUntil?: string;
 }
 
+// 005: a review of a seller after an order, or of the other side after a swap (007).
 export interface Review {
   id: string;
-  orderId: string;
-  sellerId: string;
+  // Exactly one of these is set.
+  orderId?: string;
+  swapId?: string;
+  // Who is reviewed. Always a seller, since swapping needs a seller profile too.
+  revieweeId: string;
   rating: 1 | 2 | 3 | 4 | 5;
   text: string;
   createdAt: string;
+  // The reviewed seller's one reply (005 Q-3).
+  reply?: { text: string; at: string };
 }

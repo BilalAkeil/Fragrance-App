@@ -1,16 +1,14 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { NotConnected } from "@/components/NotConnected";
 import { bottleOptions, loadOwnBottles } from "@/lib/bottles";
 import { supabaseConfigured } from "@/lib/supabase/config";
-import { getCurrentSeller } from "@/lib/supabase/server";
+import { requireVerifiedSeller } from "@/lib/identity";
 import { ListingForm } from "./ListingForm";
 
 export default async function SellPage() {
   if (!supabaseConfigured) return <NotConnected />;
-  const { supabase, user, seller } = await getCurrentSeller();
-  if (!user) redirect("/login");
-  if (!seller) redirect("/account");
+  // 005 AC-1.1: unverified sellers are sent to verify their ID first.
+  const { supabase, user } = await requireVerifiedSeller();
 
   const bottles = await loadOwnBottles(supabase, user.id);
 

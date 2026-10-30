@@ -31,7 +31,7 @@ The shared design every feature plan builds on. The rules in `CLAUDE.md` still a
   - Each side pays its fee, its deposit (equal to its items' total guide value), and any cash top-up, as ordinary captured payments.
   - The deposit and cash are refunded or transferred when the swap completes or fails.
   - Deposits replace card holds; see `docs/research/2026-10-26-holds-and-shipping.md`.
-- **ID checks:** Stripe Identity verification sessions. This can switch to the ID check inside Connect onboarding if 005 Q-5 decides so.
+- **ID checks:** the ID check inside Connect onboarding (005 Q-5, settled by copying Vinted, whose payments provider does it). A seller is verified once payouts are ready and the date of birth Stripe verified makes them 18 or over.
 - **Webhooks:**
   - one route, `/api/webhooks/stripe`, which verifies the signature
   - each event's id is stored in `webhook_events` before it's handled, so a resent event does nothing
@@ -92,7 +92,7 @@ Every upload goes in a folder named after the uploader's user id, as `lib/upload
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Web, mobile | Existing |
 | `SUPABASE_SERVICE_ROLE_KEY` | Web server only | 003 |
 | `NEXT_PUBLIC_SITE_URL` | Web | 003 |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Web | 005 (Identity), 003 |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Web | 003 |
 | `SHIPPING_PROVIDER` and that provider's keys | Web server only | 004 |
 | `CRON_SECRET` | Web server only | 004 |
 | `EMAIL_PROVIDER` and that provider's key | Web server only | 010 |

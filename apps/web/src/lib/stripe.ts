@@ -10,3 +10,4 @@ export function stripe(): Stripe {
   client ??= new Stripe(process.env.STRIPE_SECRET_KEY);
   return client;
 }
+

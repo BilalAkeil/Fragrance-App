@@ -62,4 +62,4 @@ The first time, it prints a webhook signing secret starting `whsec_`. Add it to 
 
 Any future expiry date, any CVC, and any UK postcode.
 
-When you test a seller's payout setup, Stripe's test onboarding accepts fake details. Use sort code `108800` and account number `00012345`. For the identity steps, choose the "use test data" options Stripe offers.
+When you test a seller's payout setup, Stripe's test onboarding accepts fake details. Use sort code `108800` and account number `00012345`. For the identity steps, choose the "use test data" options Stripe offers. Payout setup is also the seller's ID check (005): once it's done and they're 18 or over, they can list.

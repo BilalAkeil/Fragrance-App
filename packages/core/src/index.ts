@@ -10,4 +10,6 @@ export * from "./orders";
 export * from "./shipping";
 export * from "./checkout";
 export * from "./notifications";
+export * from "./identity";
+export * from "./reviews";
 export * from "./sample-data";

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { syncPayoutsReady } from "@/lib/payouts";
+import { syncSellerAccount } from "@/lib/payouts";
 import { stripe } from "@/lib/stripe";
 
 // Stripe's v2 account events (thin events), which say a seller's payout account
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   const accountId = related && "id" in related && typeof related.id === "string" ? related.id : undefined;
   if (ACCOUNT_EVENTS.has(notification.type) && accountId) {
     try {
-      await syncPayoutsReady(accountId);
+      await syncSellerAccount(accountId);
     } catch (err) {
       console.error(`Stripe ${notification.type} ${notification.id} failed:`, err);
       return NextResponse.json({ error: "Handling failed" }, { status: 500 });

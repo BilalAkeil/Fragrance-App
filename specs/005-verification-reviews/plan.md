@@ -10,21 +10,21 @@ How we'll build [spec.md](spec.md). Shared design: [docs/architecture.md](../../
 
 **Who can list:** the gate is enforced in the database (the insert policies), not just in the pages.
 
-**Assumed answers:**
-- **Q-1:** 5 reviews before the rating rule applies (the current placeholder).
+**Settled answers** (spec, Open questions; first built on assumed ones, then changed):
+- **Q-1:** 5 reviews before the rating rule applies.
 - **Q-2:** swap reviews count.
-- **Q-3:** a 30-day review window, and no seller replies.
-- **Q-4:** buyers aren't reviewed.
-- **Q-5:** Stripe Identity, with a document and a selfie.
-- **Q-6:** 18+ only, checked from the date of birth Identity returns.
+- **Q-3:** a 4-day review window, and the seller can reply once.
+- **Q-4:** sellers review buyers too, but not in this PR: it needs member usernames first.
+- **Q-5:** the ID check inside Stripe's payout setup (Connect onboarding).
+- **Q-6:** 18+ only, checked from the date of birth Stripe verified during payout setup.
 
 ## packages/core
 
 | Function | File | Covers |
 | --- | --- | --- |
 | `certificationProgress(seller)` returns the status plus the next step ("3 more reviews…", "Raise your average to 4★…") | `certification.ts` | AC-5.2 |
-| `REVIEW_WINDOW_DAYS = 30`, `canReview({ status, completedAt, alreadyReviewed, now })` | new `reviews.ts` | R-5, AC-2.2 |
-| `isAdult(dateOfBirth, now)` | `reviews.ts` (or `identity.ts`) | Q-6 |
+| `REVIEW_WINDOW_DAYS = 4`, `canReview({ status, endedAt, alreadyReviewed, now })`, `canReply` | new `reviews.ts` | R-5, AC-2.2, AC-2.4 |
+| `isAdult(dateOfBirth, now)`, `idCheckStatus(payoutStatus, dob, now)`, `idCheckOutcome` | `identity.ts` | Q-5, Q-6, AC-1 |
 
 ## Database
 
@@ -38,7 +38,7 @@ How we'll build [spec.md](spec.md). Shared design: [docs/architecture.md](../../
 - **`reviews`:**
   - `order_id` becomes nullable; add `swap_id` (a foreign key added in 007), `reviewer_id` and `reviewee_id`, with a check that exactly one of `order_id` or `swap_id` is set
   - unique on `order_id`, and on `(swap_id, reviewer_id)`
-- **The insert policy:** the reviewer is the order's buyer, the order is `completed` (not `delivered`), and it completed within 30 days. A refunded order after a dispute also qualifies (AC-2.3). 007 adds the swap rule.
+- **The insert policy:** the reviewer is the order's buyer, the order is `completed` (not `delivered`), and it completed within 30 days (4 days after `0017`, Q-3). A refunded order after a dispute also qualifies (AC-2.3). 007 adds the swap rule.
 - **`seller_ratings`** is rebuilt to group by `reviewee_id`, so swap reviews count.
 
 **RLS cases to test:**
@@ -48,14 +48,9 @@ How we'll build [spec.md](spec.md). Shared design: [docs/architecture.md](../../
 
 ## Server
 
-- **`startIdCheck()` (server action):** creates an Identity VerificationSession (document with a matching selfie, date of birth requested) with a return URL of `/account/verify/return`, and redirects to Stripe's hosted page.
-- **Stripe webhook:**
-  - `identity.verification_session.processing` sets `pending`
-  - `verified` sets `id_verified` (if 18+) and `verified`
-  - `requires_input` sets `needs_input`
-  - under 18 sets `needs_input` with the reason "You must be 18 or over to sell"
+- **The ID check is payout setup (Q-5):** "Verify your ID" starts 003's `startPayoutSetup`. `syncSellerAccount` (the account webhooks and the onboarding return) reads the account with its identity. Once payouts are ready and the date of birth is 18 or over, it sets `id_verified` and the check to `verified`. Under 18 sets `needs_input` with the reason `under_age`. The return sends anyone not yet verified back to `/account/verify`.
 - **`requireVerifiedSeller()`:** a server helper used by `/sell`, `/sell/bottles` and the 007 swap actions. It redirects to `/account/verify`.
-- **`submitReview(orderId, rating, text)`:** a server action through the user's client.
+- **`submitReview(orderId, rating, text)` and `replyToReview(orderId, reviewId, reply)`:** server actions through the user's client.
 
 ## packages/api
 
@@ -72,5 +67,17 @@ How we'll build [spec.md](spec.md). Shared design: [docs/architecture.md](../../
 
 ## Risks and follow-ups
 
-- **Identity's cost** is per verification. Check the price before launch.
-- **If 005 Q-5 picks the Connect ID check instead,** only `startIdCheck` and the webhook change.
+- **Connect's ID check has no selfie match,** unlike Stripe Identity. If fakes or stolen identities become a problem, Identity can be added for higher-risk sellers.
+
+## Changes while building
+
+- **The ID check's status lives in a new `id_checks` table** (`0015`), not on `sellers`. Everyone can read `sellers`, and the check's state and reason are only for the seller and admins. It has no write policies or grants: only server code writes it. Its `stripe_verification_session_id` column is unused since Q-5 moved the check into payout setup.
+- **Q-1 to Q-6 were settled mid-build** ("copy Vinted, comply with UK law"). Stripe Identity was built first, then replaced by the check in payout setup. That also removed the need for a restricted Stripe key to read the date of birth, because Connect returns it with the secret key. `0017` changes the review window from 30 days to 4, and adds seller replies.
+- **UK law on reviews (R-6):** a `/reviews-policy` page, linked from the review form and every profile.
+- **Under 18 shows as "We can't verify your ID"** with no way to try again. The status in the database is still `needs_input`, with the reason `under_age`.
+- **`reviews.seller_id` is renamed `reviewee_id`** rather than adding a second column. `reviewer_id` defaults to the signed-in user and isn't in the insert grant. `seller_ratings` keeps its columns and now runs as the reader (`security_invoker`), which also clears the security advisor's error.
+- **`orders.refunded_at`** (`0016`) is set by `transition_order`, so a review after a refund (AC-2.3) has a window to count from.
+- **Reviews don't show who wrote them,** only "Verified purchase" or "After a swap". Buyers have no public name yet. Vinted shows usernames, so this comes with Q-4's follow-up.
+- **Replies are written from the seller's order page,** and shown there and on the profile.
+- **`ListingCard`** is now its own component, with the seller's name outside the card's link so it can link to their profile.
+- **The orders list** still shows the seller's name as plain text, because each row is already a link to the order. The order page links to the seller.
