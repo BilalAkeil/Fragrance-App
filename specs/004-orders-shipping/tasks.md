@@ -3,9 +3,9 @@
 Built alongside 003. Uses the `fake` shipping provider until the broker is chosen.
 
 ## Core
-- [ ] `dates.ts`: the England and Wales bank holidays and `addWorkingDays`, plus tests across weekends and holidays (R-1)
-- [ ] `orders.ts`: constants, `shipByFrom`, `completeAfterFrom`, the order state machine, plus tests (R-1, R-3, R-5)
-- [ ] `shipping.ts`: `parcelFor` and `royalMailPerfumeProblems`; listing input refuses over 150ml. Tests (R-6, AC-1.2)
+- [x] `dates.ts`: the England and Wales bank holidays and `addWorkingDays`, plus tests across weekends and holidays (R-1)
+- [x] `orders.ts`: constants, `shipByFrom`, `completeAfterFrom`, the order state machine, plus tests (R-1, R-3, R-5)
+- [x] `shipping.ts`: `parcelFor` and `royalMailPerfumeProblems`; listing input refuses over 150ml. Tests (R-6, AC-1.2)
 
 ## Database
 - [ ] `NNNN_orders_shipping.sql`: `cancelled` status, deadline columns, drop the manual tracking grant, shipments, tracking events, dispatch postcode, `transition_order`

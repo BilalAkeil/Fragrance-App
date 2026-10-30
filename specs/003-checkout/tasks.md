@@ -3,8 +3,8 @@
 Built alongside 004. Needs Stripe test keys and the service-role key on this machine.
 
 ## Core
-- [ ] `checkoutBreakdown`: the seller receives the item price only. Update the tests (R-2)
-- [ ] `checkout.ts`: `canBuy`, `RESERVATION_MINUTES`, `reservationEndsAt`, `isUkPostcode`, `normalisePostcode`, plus tests (R-3, R-4, R-8, AC-2.1)
+- [x] `checkoutBreakdown`: the seller receives the item price only. Update the tests (R-2)
+- [x] `checkout.ts`: `canBuy`, `RESERVATION_MINUTES`, `reservationEndsAt`, `isUkPostcode`, `normalisePostcode`, plus tests (R-3, R-4, R-8, AC-2.1)
 
 ## Database
 - [ ] `NNNN_checkout.sql`: addresses, reservations, `payouts_ready`, the new order columns and unique index, `webhook_events`, `reserve_listing`

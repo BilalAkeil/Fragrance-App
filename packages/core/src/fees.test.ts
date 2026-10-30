@@ -11,10 +11,10 @@ describe("fees", () => {
     expect(cardProcessingFee(10000, "premium")).toBe(300);
   });
 
-  it("pays the seller the full item price and postage", () => {
+  it("pays the seller the full item price, and nothing for postage (R-2)", () => {
     const b = checkoutBreakdown(10000, 395);
     expect(b.buyerTotalPence).toBe(10000 + 395 + 330);
-    expect(b.sellerReceivesPence).toBe(10395);
+    expect(b.sellerReceivesPence).toBe(10000);
     expect(b.cardFeePence).toBe(Math.round(10725 * 0.015) + 20);
     expect(b.platformKeepsPence).toBe(330 - b.cardFeePence);
   });
