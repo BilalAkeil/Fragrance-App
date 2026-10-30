@@ -1,3 +1,4 @@
+import { parsePounds } from "./listing-input";
 import type { Listing } from "./types";
 
 // The shared catalogue of houses, fragrances and bottle sizes (spec 002).
@@ -110,4 +111,43 @@ export function guideValuePence(
   if (listing.kind === "full") return size.guidePricePence;
   if (listing.fillPercent === undefined) return undefined;
   return Math.round((size.guidePricePence * listing.fillPercent) / 100);
+}
+
+// One row of the catalogue CSV: house, name, concentration, year, size_ml, guide_price.
+export interface CatalogueRow {
+  house: string;
+  name: string;
+  concentration: Concentration;
+  launchYear?: number;
+  sizeMl: number;
+  guidePricePence: number;
+}
+
+// Reads a concentration as its code ("edp") or its label ("Eau de Parfum").
+export function parseConcentration(text: string): Concentration | undefined {
+  const typed = normaliseName(text);
+  return CONCENTRATIONS.find((c) => c === typed || normaliseName(CONCENTRATION_LABELS[c]) === typed);
+}
+
+// Checks one CSV row. Returns the row, or the problems with it in plain words.
+export function parseCatalogueRow(cells: Record<string, string | undefined>): CatalogueRow | { errors: string[] } {
+  const errors: string[] = [];
+  const house = cells.house?.trim() ?? "";
+  const name = cells.name?.trim() ?? "";
+  if (!house) errors.push("The house is missing.");
+  if (!name) errors.push("The name is missing.");
+  const concentration = parseConcentration(cells.concentration ?? "");
+  if (!concentration) errors.push(`"${cells.concentration ?? ""}" isn't a concentration.`);
+  const yearText = cells.year?.trim();
+  const launchYear = yearText ? Number(yearText) : undefined;
+  if (launchYear !== undefined && (!Number.isInteger(launchYear) || launchYear < 1700 || launchYear > 2100)) {
+    errors.push(`"${yearText}" isn't a launch year.`);
+  }
+  const sizeMl = Number(cells.size_ml?.trim());
+  if (!Number.isInteger(sizeMl) || sizeMl <= 0) errors.push(`"${cells.size_ml ?? ""}" isn't a size in ml.`);
+  const guidePricePence = parsePounds(cells.guide_price ?? "");
+  const priceError = guidePriceError(guidePricePence);
+  if (priceError) errors.push(priceError);
+  if (errors.length > 0 || !concentration) return { errors };
+  return { house, name, concentration, launchYear, sizeMl, guidePricePence };
 }

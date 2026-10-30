@@ -8,9 +8,9 @@
 - [x] Run it on the dev database and check the RLS cases in plan.md (plus `0007_catalogue_security.sql` and `0008_catalogue_accents.sql`, fixes after it ran)
 
 ## Server and api
-- [ ] `/api/catalogue/search` route
-- [ ] `searchCatalogue`, `getFragranceSizes` and `getGuideValue` in `packages/api`, with sample catalogue data
-- [ ] `scripts/import-catalogue.ts`, and a starter CSV with the sample fragrances
+- [x] `/api/catalogue/search` route
+- [x] `searchCatalogue`, `getFragranceSizes` and `getGuideValue` in `packages/api`, with sample catalogue data
+- [x] `scripts/import-catalogue.ts`, and a starter CSV with the sample fragrances
 - [ ] Admin actions: add and edit, set guide price, match an unmatched listing, merge (AC-3)
 
 ## Web

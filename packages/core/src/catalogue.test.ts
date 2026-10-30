@@ -6,6 +6,8 @@ import {
   guidePricePerMl,
   guideValuePence,
   normaliseName,
+  parseCatalogueRow,
+  parseConcentration,
   type FragranceSize,
 } from "./catalogue";
 
@@ -88,5 +90,40 @@ describe("guideValuePence", () => {
     expect(guideValuePence({ kind: "full", sizeMl: 75, fragranceId: "f1" }, sizes)).toBeUndefined();
     expect(guideValuePence({ kind: "decant", sizeMl: 10, fragranceId: "f1" }, [])).toBeUndefined();
     expect(guideValuePence({ kind: "full", sizeMl: 50, fragranceId: "f2" }, sizes)).toBeUndefined();
+  });
+});
+
+describe("parseConcentration", () => {
+  it("reads codes and labels", () => {
+    expect(parseConcentration("EDP")).toBe("edp");
+    expect(parseConcentration("eau de toilette")).toBe("edt");
+    expect(parseConcentration("Extrait de Parfum")).toBe("extrait");
+    expect(parseConcentration("cologne-ish")).toBeUndefined();
+  });
+});
+
+describe("parseCatalogueRow", () => {
+  it("reads a good row", () => {
+    expect(
+      parseCatalogueRow({
+        house: " Dior ",
+        name: "Sauvage",
+        concentration: "Eau de Parfum",
+        year: "2018",
+        size_ml: "100",
+        guide_price: "120.00",
+      }),
+    ).toEqual({ house: "Dior", name: "Sauvage", concentration: "edp", launchYear: 2018, sizeMl: 100, guidePricePence: 12000 });
+  });
+
+  it("allows a missing year", () => {
+    expect(
+      parseCatalogueRow({ house: "Dior", name: "Sauvage", concentration: "edt", year: "", size_ml: "60", guide_price: "70" }),
+    ).toMatchObject({ launchYear: undefined, guidePricePence: 7000 });
+  });
+
+  it("lists every problem", () => {
+    const result = parseCatalogueRow({ house: "", name: "X", concentration: "spray", year: "1066", size_ml: "0", guide_price: "0" });
+    expect("errors" in result && result.errors).toHaveLength(5);
   });
 });
