@@ -34,6 +34,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         >
           Sellers
         </Link>
+        <Link
+          href="/admin/catalogue"
+          className="rounded-lg px-3 py-2.5 text-sm font-semibold text-line hover:bg-neutral-ink hover:text-white"
+        >
+          Catalogue
+        </Link>
       </nav>
       <div className="min-w-0 flex-1">{children}</div>
     </div>
