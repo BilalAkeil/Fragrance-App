@@ -3,20 +3,28 @@ import { notFound, redirect } from "next/navigation";
 import {
   DELIVERY_SERVICES,
   PACKING_GUIDANCE,
+  REVIEW_TEXT_MAX,
+  canReview,
   checkoutBreakdown,
   formatGBP,
   nextStep,
+  orderEndedAt,
+  reviewWindowEnds,
   timeLeft,
   type Order,
+  type Review,
 } from "@fragrance/core";
-import { getOrder } from "@fragrance/api";
+import { getOrder, getOrderReview } from "@fragrance/api";
 import { BottleTile } from "@/components/BottleTile";
+import { inputClass } from "@/components/Field";
 import { NotConnected } from "@/components/NotConnected";
+import { SellerLink } from "@/components/SellerLink";
 import { KIND_LABELS, ORDER_STATUS_LABELS } from "@/components/labels";
 import { buttonPrimary, buttonSecondary, pageTitle, panel } from "@/components/ui";
+import { marketplace } from "@/lib/marketplace";
 import { supabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
-import { confirmEverythingOk } from "../actions";
+import { confirmEverythingOk, submitReview } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -29,11 +37,11 @@ export default async function OrderPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ confirmed?: string; error?: string }>;
+  searchParams: Promise<{ confirmed?: string; error?: string; review?: string }>;
 }) {
   if (!supabaseConfigured) return <NotConnected />;
   const { id } = await params;
-  const { confirmed, error } = await searchParams;
+  const { confirmed, error, review: reviewNotice } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -45,6 +53,11 @@ export default async function OrderPage({
   const price = checkoutBreakdown(order.itemPence, order.postagePence);
   const step = nextStep(order, role);
   const now = new Date();
+  const endedAt = orderEndedAt(order);
+  const [review, [seller]] = await Promise.all([
+    endedAt ? getOrderReview(supabase, order.id) : undefined,
+    role === "buyer" ? marketplace.getSellers([order.sellerId]) : [],
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -65,6 +78,9 @@ export default async function OrderPage({
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[1_1_480px] flex-col gap-6">
           <NextStep order={order} role={role} step={step} now={now} />
+          {endedAt && (
+            <ReviewSection order={order} role={role} review={review} endedAt={endedAt} now={now} notice={reviewNotice} />
+          )}
           <Timeline order={order} />
         </div>
 
@@ -80,6 +96,12 @@ export default async function OrderPage({
                 <Link href={`/listings/${order.listingId}`} className="font-bold text-brand underline">
                   The listing
                 </Link>
+                {seller && (
+                  <>
+                    <br />
+                    Sold by <SellerLink seller={seller} />
+                  </>
+                )}
               </span>
             </div>
             <dl className="flex flex-col gap-1.5 text-sm">
@@ -191,6 +213,109 @@ function NextStep({
       {order.status === "completed" && role === "seller" && (
         <p className="text-sm text-muted">The item price is on its way to your bank.</p>
       )}
+    </section>
+  );
+}
+
+const REVIEW_NOTICES: Record<string, string> = {
+  rating: "Choose a rating from 1 to 5 stars.",
+  long: `Keep your review to ${REVIEW_TEXT_MAX} characters.`,
+  closed: "This order can't be reviewed any more.",
+  error: "Your review couldn't be saved. Please try again.",
+};
+
+const stars = (n: number) => "★".repeat(n) + "☆".repeat(5 - n);
+
+// 005 US-2: the buyer reviews the seller once the order is finished. The seller
+// sees the review they were given.
+function ReviewSection({
+  order,
+  role,
+  review,
+  endedAt,
+  now,
+  notice,
+}: {
+  order: Order;
+  role: "buyer" | "seller";
+  review?: Review;
+  endedAt: Date;
+  now: Date;
+  notice?: string;
+}) {
+  if (review) {
+    return (
+      <section id="review" className={`${panel} flex flex-col gap-2`}>
+        <h2 className="text-lg font-extrabold">
+          {role === "buyer" ? (notice === "thanks" ? "Thanks for your review" : "Your review") : "The buyer's review"}
+        </h2>
+        <p className="text-lg text-brand" aria-label={`${review.rating} out of 5 stars`}>
+          {stars(review.rating)}
+        </p>
+        {review.text && <p className="text-sm">{review.text}</p>}
+        {role === "buyer" && notice === "thanks" && (
+          <p className="text-sm text-muted">
+            It&apos;s on the seller&apos;s{" "}
+            <Link href={`/sellers/${order.sellerId}`} className="font-bold text-brand underline">
+              profile
+            </Link>{" "}
+            now, where it helps other buyers.
+          </p>
+        )}
+      </section>
+    );
+  }
+  if (role !== "buyer") return null;
+  const open = canReview({ status: order.status, endedAt, alreadyReviewed: false, now });
+  if (!open) {
+    return (
+      <section id="review" className={`${panel} text-sm text-muted`}>
+        {notice && REVIEW_NOTICES[notice] ? REVIEW_NOTICES[notice] : "The time to review this order has passed."}
+      </section>
+    );
+  }
+  return (
+    <section id="review" className={`${panel} flex flex-col gap-4`}>
+      <div>
+        <h2 className="text-lg font-extrabold">How was the seller?</h2>
+        <p className="text-sm text-muted">
+          Your review goes on their public profile. You can leave one until {day(reviewWindowEnds(endedAt).toISOString())}.
+        </p>
+      </div>
+      <form action={submitReview} className="flex flex-col gap-4">
+        <input type="hidden" name="orderId" value={order.id} />
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-2 text-sm font-bold">Rating</legend>
+          <div className="flex flex-wrap gap-2">
+            {[5, 4, 3, 2, 1].map((n) => (
+              <label
+                key={n}
+                className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-field px-4 text-sm has-[:checked]:border-brand has-[:checked]:bg-sky"
+              >
+                <input type="radio" name="rating" value={n} required className="size-4 accent-brand" />
+                <span className="text-brand" aria-hidden>
+                  {stars(n)}
+                </span>
+                <span className="sr-only">{n} out of 5 stars</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <label className="flex flex-col gap-1 text-sm font-bold">
+          What was it like? (optional)
+          <textarea
+            name="text"
+            rows={3}
+            maxLength={REVIEW_TEXT_MAX}
+            className={`${inputClass} font-normal`}
+            placeholder="Was it as described? How was it packed?"
+          />
+        </label>
+        {notice && REVIEW_NOTICES[notice] && <p className="text-sm text-danger">{REVIEW_NOTICES[notice]}</p>}
+        <div>
+          <button className={buttonPrimary}>Post review</button>
+        </div>
+      </form>
     </section>
   );
 }

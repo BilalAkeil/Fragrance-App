@@ -9,6 +9,7 @@ import {
   sampleFragranceSizes,
   sampleHouses,
   sampleListings,
+  sampleReviews,
   sampleSellers,
   sampleSourceBottles,
   type Fragrance,
@@ -16,6 +17,7 @@ import {
   type House,
   type Listing,
   type ListingFilter,
+  type Review,
   type Seller,
   type SourceBottle,
 } from "@fragrance/core";
@@ -24,12 +26,15 @@ import {
   toFragranceSize,
   toHouse,
   toListing,
+  toReview,
   toSeller,
+  REVIEW_COLUMNS,
   toSourceBottle,
   type FragranceRow,
   type FragranceSizeRow,
   type HouseRow,
   type ListingRow,
+  type ReviewRow,
   type SellerRatingRow,
   type SellerRow,
   type SourceBottleRow,
@@ -55,7 +60,26 @@ export interface Marketplace {
   getFragranceSizes(fragranceId: string): Promise<FragranceSize[]>;
   // What a listing is worth in a swap, or undefined if it can't be valued (AC-4).
   getGuideValue(listing: Listing): Promise<number | undefined>;
+  // 005 AC-4.1: a seller's public profile, with the first page of reviews.
+  getSellerProfile(id: string): Promise<SellerProfile | undefined>;
+  // A seller's reviews, newest first, a page at a time (from 0).
+  listReviews(sellerId: string, page?: number): Promise<ReviewPage>;
 }
+
+export interface ReviewPage {
+  reviews: Review[];
+  hasMore: boolean;
+}
+
+export interface SellerProfile extends ReviewPage {
+  seller: Seller;
+  // Active listings, newest first.
+  listings: Listing[];
+}
+
+export const REVIEWS_PAGE_SIZE = 20;
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface CatalogueResults {
   houses: House[];
@@ -135,7 +159,7 @@ export function supabaseMarketplace(client: SupabaseClient): Marketplace {
     async getSellers(ids) {
       if (ids.length === 0) return [];
       const [sellers, ratings] = await Promise.all([
-        client.from("sellers").select("id, display_name, id_verified, payouts_ready").in("id", ids),
+        client.from("sellers").select("id, display_name, id_verified, payouts_ready, created_at").in("id", ids),
         client.from("seller_ratings").select("seller_id, review_count, average_rating").in("seller_id", ids),
       ]);
       if (sellers.error) throw sellers.error;
@@ -218,6 +242,39 @@ export function supabaseMarketplace(client: SupabaseClient): Marketplace {
       if (!listing.fragranceId) return undefined;
       return guideValuePence(listing, await this.getFragranceSizes(listing.fragranceId));
     },
+
+    async getSellerProfile(id) {
+      // A mistyped link isn't a uuid, which the database would refuse.
+      if (!UUID.test(id)) return undefined;
+      const [[seller], listings, reviews] = await Promise.all([
+        this.getSellers([id]),
+        client
+          .from("listings")
+          .select(LISTING_COLUMNS)
+          .eq("seller_id", id)
+          .eq("status", "active")
+          .order("created_at", { ascending: false })
+          .limit(60),
+        this.listReviews(id),
+      ]);
+      if (!seller) return undefined;
+      if (listings.error) throw listings.error;
+      return { seller, listings: (listings.data as unknown as ListingRow[]).map((r) => toListing(r, photoUrl)), ...reviews };
+    },
+
+    async listReviews(sellerId, page = 0) {
+      // One extra row says whether there's another page.
+      const from = page * REVIEWS_PAGE_SIZE;
+      const { data, error } = await client
+        .from("reviews")
+        .select(REVIEW_COLUMNS)
+        .eq("reviewee_id", sellerId)
+        .order("created_at", { ascending: false })
+        .range(from, from + REVIEWS_PAGE_SIZE);
+      if (error) throw error;
+      const rows = data as ReviewRow[];
+      return { reviews: rows.slice(0, REVIEWS_PAGE_SIZE).map(toReview), hasMore: rows.length > REVIEWS_PAGE_SIZE };
+    },
   };
 }
 
@@ -270,5 +327,19 @@ export const sampleMarketplace: Marketplace = {
   async getGuideValue(listing) {
     if (!listing.fragranceId) return undefined;
     return guideValuePence(listing, await this.getFragranceSizes(listing.fragranceId));
+  },
+  async getSellerProfile(id) {
+    const seller = sampleSellers.find((s) => s.id === id);
+    if (!seller) return undefined;
+    return {
+      seller,
+      listings: sampleListings.filter((l) => l.sellerId === id && l.status === "active"),
+      ...(await this.listReviews(id)),
+    };
+  },
+  async listReviews(sellerId, page = 0) {
+    const all = sampleReviews.filter((r) => r.revieweeId === sellerId);
+    const from = page * REVIEWS_PAGE_SIZE;
+    return { reviews: all.slice(from, from + REVIEWS_PAGE_SIZE), hasMore: all.length > from + REVIEWS_PAGE_SIZE };
   },
 };

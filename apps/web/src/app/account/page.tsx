@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { canEditListing, formatGBP, type ListingKind } from "@fragrance/core";
+import { canEditListing, certificationProgress, formatGBP, type ListingKind } from "@fragrance/core";
 import { NotConnected } from "@/components/NotConnected";
 import { supabaseConfigured } from "@/lib/supabase/config";
 import { inputClass } from "@/components/Field";
 import { buttonPrimary, buttonSecondary, pageTitle, panel } from "@/components/ui";
 import { KIND_LABELS } from "@/components/labels";
 import { BOTTLE_STATUS_LABELS, loadOwnBottles } from "@/lib/bottles";
+import { marketplace } from "@/lib/marketplace";
 import { getCurrentSeller } from "@/lib/supabase/server";
 import { RemoveListingButton } from "../listings/[id]/RemoveListingButton";
 import { createSellerProfile, setDispatchPostcode, signOut } from "./actions";
@@ -62,6 +63,10 @@ export default async function AccountPage({
       ])
     : [null, [], null];
 
+  // 005 AC-5: certification comes from the core rules, with their rating.
+  const ratedSeller = seller ? (await marketplace.getSellers([seller.id]))[0] : undefined;
+  const progress = ratedSeller ? certificationProgress(ratedSeller) : undefined;
+
   // 003 AC-3.1: payouts, read live from Stripe. 004: where the seller posts from.
   let payoutState: PayoutStatus = "not_started";
   let dispatchPostcode: string | null = null;
@@ -110,16 +115,38 @@ export default async function AccountPage({
         <>
           <section className={panel}>
             <h2 className="text-lg font-extrabold">{seller.display_name}</h2>
-            <p className="mt-1 text-sm">
-              ID check:{" "}
-              {seller.id_verified ? (
-                <span className="font-semibold text-verified">verified</span>
-              ) : (
-                <Link href="/account/verify" className="font-bold text-brand underline">
-                  verify your ID to start selling
-                </Link>
-              )}
-            </p>
+            {/* 005 AC-5.1, AC-5.2: where they stand on certification, and what's next. */}
+            {progress && (
+              <div className="mt-2 flex flex-col gap-1 text-sm">
+                <p>
+                  <span className="font-semibold">Status: </span>
+                  <span className={progress.status === "certified" ? "font-semibold text-verified" : "font-semibold"}>
+                    {progress.label}
+                  </span>
+                  {ratedSeller && ratedSeller.reviewCount > 0 && (
+                    <span className="text-muted">
+                      {" "}
+                      · {ratedSeller.averageRating.toFixed(1)}★ from {ratedSeller.reviewCount}{" "}
+                      {ratedSeller.reviewCount === 1 ? "review" : "reviews"}
+                    </span>
+                  )}
+                </p>
+                <p className="text-muted">
+                  {progress.status === "unverified" ? (
+                    <Link href="/account/verify" className="font-bold text-brand underline">
+                      {progress.nextStep}
+                    </Link>
+                  ) : (
+                    progress.nextStep
+                  )}
+                </p>
+                <p>
+                  <Link href={`/sellers/${seller.id}`} className="font-bold text-brand underline">
+                    Your public profile
+                  </Link>
+                </p>
+              </div>
+            )}
             <div className="mt-4 flex flex-wrap gap-3">
               <Link href="/sell" className={buttonPrimary}>
                 Sell a fragrance

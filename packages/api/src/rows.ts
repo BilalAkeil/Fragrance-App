@@ -1,4 +1,4 @@
-import type { Fragrance, FragranceSize, House, Listing, Seller, SourceBottle } from "@fragrance/core";
+import type { Fragrance, FragranceSize, House, Listing, Review, Seller, SourceBottle } from "@fragrance/core";
 
 // Database rows as Supabase returns them (snake_case).
 
@@ -7,7 +7,20 @@ export interface SellerRow {
   display_name: string;
   id_verified: boolean;
   payouts_ready?: boolean;
+  created_at?: string;
 }
+
+export interface ReviewRow {
+  id: string;
+  order_id: string | null;
+  swap_id: string | null;
+  reviewee_id: string;
+  rating: number;
+  text: string;
+  created_at: string;
+}
+
+export const REVIEW_COLUMNS = "id, order_id, swap_id, reviewee_id, rating, text, created_at";
 
 export interface SellerRatingRow {
   seller_id: string;
@@ -83,6 +96,19 @@ export function toSeller(row: SellerRow, rating?: SellerRatingRow): Seller {
     payoutsReady: row.payouts_ready ?? false,
     reviewCount: rating ? Number(rating.review_count) : 0,
     averageRating: rating?.average_rating != null ? Number(rating.average_rating) : 0,
+    joinedAt: row.created_at,
+  };
+}
+
+export function toReview(row: ReviewRow): Review {
+  return {
+    id: row.id,
+    orderId: row.order_id ?? undefined,
+    swapId: row.swap_id ?? undefined,
+    revieweeId: row.reviewee_id,
+    rating: row.rating as Review["rating"],
+    text: row.text,
+    createdAt: row.created_at,
   };
 }
 

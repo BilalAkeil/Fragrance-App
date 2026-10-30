@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toFragrance, toFragranceSize, toListing, toSeller } from "./rows";
+import { toFragrance, toFragranceSize, toListing, toReview, toSeller } from "./rows";
 
 describe("row mapping", () => {
   it("maps a seller with its rating", () => {
@@ -16,6 +16,26 @@ describe("row mapping", () => {
       averageRating: 4.29,
       payoutsReady: false,
     });
+  });
+
+  it("keeps when a seller joined", () => {
+    expect(toSeller({ id: "s1", display_name: "A", id_verified: true, created_at: "2026-10-01T10:00:00Z" }).joinedAt).toBe(
+      "2026-10-01T10:00:00Z",
+    );
+  });
+
+  it("maps an order review", () => {
+    expect(
+      toReview({
+        id: "r1",
+        order_id: "o1",
+        swap_id: null,
+        reviewee_id: "s1",
+        rating: 4,
+        text: "Good",
+        created_at: "2026-10-30T10:00:00Z",
+      }),
+    ).toEqual({ id: "r1", orderId: "o1", swapId: undefined, revieweeId: "s1", rating: 4, text: "Good", createdAt: "2026-10-30T10:00:00Z" });
   });
 
   it("treats a seller with no reviews as zero", () => {

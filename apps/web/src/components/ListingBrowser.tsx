@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { formatGBP, type House, type ListingFilter, type Listing, type ListingKind, type Seller } from "@fragrance/core";
-import { BottleTile } from "./BottleTile";
+import { type House, type ListingFilter, type Listing, type ListingKind, type Seller } from "@fragrance/core";
 import { inputClass } from "./Field";
-import { CONDITION_LABELS, KIND_LABELS } from "./labels";
-import { SellerBadge } from "./SellerBadge";
+import { CONDITION_LABELS } from "./labels";
+import { ListingGrid } from "./ListingCard";
 import { buttonPrimary } from "./ui";
 
 const KIND_FILTERS: { value?: ListingKind; label: string }[] = [
@@ -120,37 +119,7 @@ export function ListingBrowser({
           )}
         </div>
       ) : (
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-x-5 gap-y-8">
-          {listings.map((l) => {
-            const seller = sellers.find((s) => s.id === l.sellerId);
-            return (
-              <li key={l.id}>
-                <Link href={`/listings/${l.id}`} className="group flex flex-col gap-2.5 text-ink">
-                  <div className="relative aspect-[4/5] overflow-hidden rounded-2xl group-hover:outline-2 group-hover:outline-brand">
-                    <BottleTile kind={l.kind} photo={l.photos[0]} alt={`${l.house} ${l.name}`} />
-                    <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-0.5 text-xs font-bold">
-                      {KIND_LABELS[l.kind]}
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-[13px] font-semibold text-muted">{l.house}</span>
-                    <span className="font-bold">{l.name}</span>
-                    <span className="text-sm text-muted">
-                      {l.sizeMl}ml{l.fillPercent !== undefined ? ` · ${l.fillPercent}% full` : ""}
-                    </span>
-                    <span className="mt-1 text-[17px] font-extrabold">{formatGBP(l.pricePence)}</span>
-                    {seller && (
-                      <span className="mt-1 flex flex-wrap items-center gap-2 text-[13px]">
-                        <span className="text-muted">{seller.displayName}</span>
-                        <SellerBadge seller={seller} />
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <ListingGrid listings={listings} sellers={sellers} />
       )}
     </div>
   );

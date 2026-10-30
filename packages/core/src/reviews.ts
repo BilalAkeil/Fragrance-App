@@ -1,4 +1,4 @@
-import type { OrderStatus } from "./orders";
+import type { Order, OrderStatus } from "./orders";
 
 // Reviews after an order or swap (spec 005, US-2 and US-3).
 
@@ -32,4 +32,10 @@ export function canReview(order: {
   if (order.alreadyReviewed || !order.endedAt) return false;
   if (order.status !== "completed" && order.status !== "refunded") return false;
   return order.now < reviewWindowEnds(order.endedAt);
+}
+
+// When an order ended for reviewing: when it completed, or was refunded after a dispute.
+export function orderEndedAt(order: Pick<Order, "status" | "completedAt" | "refundedAt">): Date | undefined {
+  const at = order.status === "completed" ? order.completedAt : order.status === "refunded" ? order.refundedAt : undefined;
+  return at ? new Date(at) : undefined;
 }
