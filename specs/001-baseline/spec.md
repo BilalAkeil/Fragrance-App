@@ -51,7 +51,8 @@ Sign-in, seller profiles, listing a fragrance and browsing were built before we 
 - **AC-3.2:** Given I leave the batch code empty, when I submit, then the listing is created and shows a "No batch code" tag.
 - **AC-3.3:** Given I enter a batch code, then the listing shows "Batch <code>".
 - **AC-3.4:** Given any rule below is broken, when I submit, then nothing is saved and every problem is listed in plain words above the button.
-- **AC-3.5:** When the listing is saved, then I'm taken to its page and it appears in browse straight away.
+- **AC-3.5:** When the listing is published, then I'm taken to its page and it appears in browse straight away.
+- **AC-3.6:** I can save an unfinished listing as a draft instead of publishing it (Q-3). Drafts are only visible to me, on my account page, where I can finish and publish them or delete them. The rules below are checked when I publish, not when I save a draft.
 
 ### US-4: As a decant seller, I want to show where a decant came from so that buyers trust it
 
@@ -114,6 +115,7 @@ Each rule ends up as a function in `packages/core`, with tests.
 - **R-9:** Decants linked to one bottle, whether listed or sold and not removed, never add up to more than the bottle's size. This is enforced in the database as well as the form.
 - **R-10:** "Verified source" shows only when a decant is linked to a bottle with a checked video.
 - **R-11:** Only the owner can edit or remove a listing, and only while it isn't sold.
+- **R-12:** A draft is visible only to its owner, never appears in browse or search, and can't be bought. R-1 to R-10 apply when it's published (Q-3).
 
 ## Data
 
@@ -132,11 +134,14 @@ Who can see what stays as `0002_security.sql` sets it. Listing photos and active
 - **Listing page:** as AC-8.1, plus a sold/removed state.
 - **Sell form:** the batch code shows as optional. For decants there's an optional "Link a source bottle" choice, with a link to register one.
 - **Register bottle:** the form, including the video instructions.
-- **Account:** my profile, listings (Active, Sold, Removed, with edit and remove) and bottles (with status).
+- **Account:** my profile, listings (Drafts, Active, Sold, Removed, with edit and remove) and bottles (with status).
+- **Sell form:** a "Save draft" button next to publish.
 - **Sign in:** the form, then a "check your email" confirmation.
 
 ## Open questions
 
-- [ ] **Q-1:** Can a decant be linked to a bottle that hasn't been checked yet, with the badge appearing later (as AC-4.3 assumes)? Or only to checked bottles?
-- [ ] **Q-2:** Should "Verified source" and "Receipt verified" be search filters too, or only badges?
-- [ ] **Q-3:** Today a listing goes live as soon as it's saved. Do we want a draft state, so sellers can save and finish later?
+Settled on 2026-10-30 with Ben's rule: copy Vinted, and comply with UK law (law wins where they clash). Questions still open say why.
+
+- [x] **Q-1:** Can a decant be linked to a bottle that hasn't been checked yet, with the badge appearing later? **Yes, as AC-4.3 says.** The decisions table says linking a bottle "earns a 'Verified source' badge once checked". Under the DMCC Act 2024 rules on misleading practices, the badge must never show before the check, and it doesn't.
+- [x] **Q-2:** Should "Verified source" and "Receipt verified" be search filters too? **No, badges only.** Vinted's catalogue filters are item details (category, brand, size, condition, price), with no filter for checks.
+- [x] **Q-3:** Do we want a draft state? **Yes.** Vinted lets sellers save an unfinished listing as a draft and finish it later ([Vinted: save an item draft](https://www.vinted.co.uk/help/421)). Added as AC-3.6 and R-12.

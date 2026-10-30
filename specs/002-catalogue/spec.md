@@ -75,7 +75,9 @@ Everyone can read the catalogue. Only admins can write to it.
 
 ## Open questions
 
-- [ ] **Q-1:** Where does the starting catalogue come from? We can't copy another site's database. Options: build it by hand for the top few hundred fragrances, grow it from what sellers list, or license a dataset.
-- [ ] **Q-2:** Where do guide prices come from, and how often are they updated? This is brief Q-5a. Options: set by hand, or worked out from recent sales here with a manual starting value.
-- [ ] **Q-3:** Do we treat flankers and reformulations (for example vintage versus current batches) as separate fragrances?
-- [ ] **Q-4:** Should we fill notes in from the catalogue, or keep them as the seller writes them?
+Settled on 2026-10-30 with Ben's rule: copy Vinted, and comply with UK law (law wins where they clash). Questions still open say why.
+
+- [x] **Q-1:** Where does the starting catalogue come from? **We build our own by hand for the most common fragrances, and grow it from what sellers type in (AC-1.4).** UK database right (the Copyright and Rights in Databases Regulations 1997) stops us copying a substantial part of another site's database. Vinted keeps its own brand list and lets sellers enter a brand that isn't on it. Licensing a dataset stays possible, but that's a cost call for Bilal.
+- [ ] **Q-2:** Where do guide prices come from, and how often are they updated? This is brief Q-5a. Options: set by hand, or worked out from recent sales here with a manual starting value. **Still open:** Vinted has no guide prices, and no law decides it. This is a business call for Bilal.
+- [ ] **Q-3:** Do we treat flankers and reformulations (for example vintage versus current batches) as separate fragrances? **Still open:** Vinted has no fragrance catalogue to copy, and no law decides it. This is a catalogue call for Bilal.
+- [x] **Q-4:** Should we fill notes in from the catalogue? **No, notes stay as the seller writes them.** On Vinted the seller writes the description and is responsible for it being accurate. Filling notes in for them could misdescribe a reformulated bottle, which the DMCC Act 2024 treats as a misleading action.

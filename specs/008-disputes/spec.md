@@ -34,7 +34,7 @@ Buyer Protection and Swap Protection are only real if problems get sorted out fa
   - I think it's not genuine
 - **AC-1.2:** I describe the problem and add photos. For "not genuine", I'm asked for photos of the batch code, the bottle base and the box.
 - **AC-1.3:** When I submit, then the order is Disputed, the seller isn't paid, and the seller is told (010).
-- **AC-1.4:** Given tracking never shows delivered, then after 7 days (Q-4) I can report "Not received" from the order page.
+- **AC-1.4:** Given tracking hasn't shown delivered 7 working days after Royal Mail's due date (Q-4), then I can report "Not received" from the order page. I'm refunded in full, and we claim from Royal Mail.
 
 ### US-2: As a seller, I want to respond so that my side is heard
 
@@ -44,7 +44,7 @@ Buyer Protection and Swap Protection are only real if problems get sorted out fa
 ### US-3: As a buyer and seller, I want to settle it between us where we can
 
 - **AC-3.1:** Given the seller offers a partial refund and I accept, then I'm refunded that amount, the order completes, and the seller is paid the rest.
-- **AC-3.2:** Given a full refund with a return is agreed, then I get a prepaid return label (Q-2 says who pays for it). I'm refunded once tracking shows the item back with the seller, or after 48 hours if the seller doesn't report a problem with the return.
+- **AC-3.2:** Given a full refund with a return is agreed, then I get a prepaid return label. I pay for it, unless the seller offers to (Q-1), and its cost comes off my refund. I'm refunded once tracking shows the item back with the seller, or after 48 hours if the seller doesn't report a problem with the return. If the return is lost or damaged in the post, I'm not charged for it.
 
 ### US-4: As an admin, I want everything in one place to decide fairly
 
@@ -55,7 +55,8 @@ Buyer Protection and Swap Protection are only real if problems get sorted out fa
   - tracking
   - the message thread (006)
 - **AC-4.2:** I decide one of: full refund with return, full refund without return, partial refund, or no refund. I give a reason that both sides see.
-- **AC-4.3:** Given I decide an item isn't genuine, then the listing is removed, the seller is flagged, and their other listings are queued for review.
+- **AC-4.3:** Given I decide an item isn't genuine, then the buyer is refunded in full without returning it (Q-2), the listing is removed, the seller gets a strike (R-6), and their other listings are queued for review. Given the evidence isn't strong enough, then it's handled as "not as described", with a return.
+- **AC-4.4:** Either side can appeal my decision once, within 14 days, with a reason and any new evidence (Q-3). The appeal is decided by an admin, and that decision is final.
 
 ### US-5: As a swapper, I want the same protection
 
@@ -64,12 +65,12 @@ Buyer Protection and Swap Protection are only real if problems get sorted out fa
 
 ## Rules
 
-- **R-1:** A problem can be reported only within 48 hours of delivery or collection, or as "Not received" after the not-received wait (Q-4).
+- **R-1:** A problem can be reported only within 48 hours of delivery or collection, or as "Not received" once 7 working days have passed since Royal Mail's due date with no delivery (Q-4).
 - **R-2:** While a dispute is open, no money moves to the other side, and the order or swap can't complete.
-- **R-3:** A full refund returns the item price, postage and Buyer Protection fee.
+- **R-3:** A full refund returns the item price, postage and Buyer Protection fee. When the buyer pays for a return, the return label's cost comes off the refund (Q-1).
 - **R-4:** A partial refund can't be more than the item price.
 - **R-5:** Every decision has a reason that both sides can see.
-- **R-6:** A seller with N upheld "not genuine" decisions is suspended (Q-5).
+- **R-6:** Each upheld "not genuine" decision gives the seller a warning (a strike). On the 4th, the account is banned (Q-5).
 
 ## Data
 
@@ -91,8 +92,10 @@ Buyer Protection and Swap Protection are only real if problems get sorted out fa
 
 ## Open questions
 
-- [ ] **Q-1:** Who pays return postage, the seller or the buyer, and does it depend on the reason? On Vinted the buyer pays unless the item isn't genuine or isn't as described.
-- [ ] **Q-2:** For "not genuine", do we ask for the item back before refunding, so the seller can't relist a fake? Or refund straight away?
-- [ ] **Q-3:** Can either side appeal an admin decision?
-- [ ] **Q-4:** How many days after the expected delivery can "Not received" be reported (7 is assumed)? Do we claim from the carrier ourselves?
-- [ ] **Q-5:** How many upheld "not genuine" decisions before a seller is suspended? Is one enough?
+Settled on 2026-10-30 with Ben's rule: copy Vinted, and comply with UK law (law wins where they clash). Questions still open say why.
+
+- [x] **Q-1:** Who pays return postage? **The buyer, for any return, unless the seller offers to pay. It comes off their refund.** Vinted: "When returning an item, the buyer pays for return shipping" ([Vinted: returning an item](https://www.vinted.co.uk/help/272)). It matches the brief. The Consumer Rights Act 2015 doesn't apply, because our sellers are private people, not traders. AC-3.2 and R-3 updated.
+- [x] **Q-2:** For "not genuine", is the item returned before the refund? **No. With strong evidence, the buyer is refunded in full and doesn't send it back, so the seller can't relist it. With weak evidence, it's handled as "not as described", with a return.** This copies Vinted ([Vinted: item seems to be counterfeit](https://www.vinted.co.uk/help/1471), and its terms, section 11). AC-4.3 updated.
+- [x] **Q-3:** Can either side appeal? **Yes, once, within 14 days.** Vinted allows one appeal against a moderation decision ([Vinted: appeal a moderation decision](https://www.vinted.co.uk/help/1599)), and gives sellers 14 days to dispute a claim. Added as AC-4.4.
+- [x] **Q-4:** When can "Not received" be reported, and do we claim from the carrier? **7 working days after Royal Mail's due date, and yes, we claim, as the sender.** Royal Mail accepts Tracked loss claims only after that wait, and only from the sender. Vinted refunds in full once a parcel is confirmed lost. This matches 004 Q-5. AC-1.4 and R-1 updated.
+- [x] **Q-5:** How many upheld "not genuine" decisions before a seller is suspended? **A warning each time, and a ban on the 4th.** The decisions table settles this (Bilal, 2026-10-26). 008's plan says one suspends; the table wins, so the plan needs updating. R-6 updated.

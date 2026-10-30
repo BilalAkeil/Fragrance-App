@@ -87,7 +87,7 @@ Fragrance fans often have bottles they're bored of and bottles they want. Swappi
 ## Rules
 
 - **R-1:** Only ID-verified users can propose or accept swaps.
-- **R-2:** Every item in a swap is an active listing of the person offering it, marked "Open to swaps", with a guide value (002).
+- **R-2:** Every item in a swap is an active listing of the person offering it, with a sale price, marked "Open to swaps", with a guide value (002). There are no swap-only listings (Q-7).
 - **R-3:** Anything can be swapped: full bottles, partials and decants, in any mix. Decants follow the same rules as in sales (001).
 - **R-4:** Each side's card hold equals the total guide value of the items they're sending (002, R-3 and R-4).
 - **R-5:** Each side pays one Swap Protection fee per swap (amount: Q-3).
@@ -101,7 +101,7 @@ Fragrance fans often have bottles they're bored of and bottles they want. Swappi
 
   It can also end as Declined, Withdrawn, Lapsed, Closed (an item went elsewhere), Cancelled (someone didn't ship), or Disputed (008).
 - **R-8:** Nothing is charged before acceptance.
-- **R-9:** Each side pays the postage for the parcel they send, chosen when they pay (Q-5).
+- **R-9:** Each side picks and pays for the delivery of the parcel coming to them, when they pay, just as a buyer does (Q-5).
 - **R-10:** When a swap fails because one side doesn't ship or sends a fake (decided in 008), the side at fault is charged the full guide value of the items they promised, which is paid to the other side. The other side also gets back their Swap Protection fee and any cash they paid.
 
 ## Data
@@ -128,11 +128,13 @@ Fragrance fans often have bottles they're bored of and bottles they want. Swappi
 
 ## Open questions
 
-- [ ] **Q-1:** "Swap" or "Trade" for users? This is brief Q-12.
+Settled on 2026-10-30 with Ben's rule: copy Vinted, and comply with UK law (law wins where they clash). Questions still open say why.
+
+- [ ] **Q-1:** "Swap" or "Trade" for users? This is brief Q-12. **Still open:** it's a naming and brand call. Vinted's terms today don't mention swaps at all, so there's nothing to copy.
 - [x] **Q-2:** When someone doesn't ship or sends a fake, what does it cost them? **The full guide value of what they promised, paid to the other person, who also gets their fee and cash back** (Bilal, 2026-10-26, PR #8). How it's collected depends on Q-4. The Trade design's copy needs updating to match.
-- [ ] **Q-3:** What's the Swap Protection fee? This is brief Q-2; Buyer Protection is settled at 3% + 30p. Does Buyer Protection also apply to the cash part?
-- [ ] **Q-4:** A card hold normally lasts 7 days, and a swap runs 10 to 14. This is brief Q-4. **Proposed:** take each side's swap value as a deposit, refunded in full on completion. It works on every card and makes Bilal's failed-swap compensation certain. It costs about 1.5% + 20p of the deposit, so the Swap Protection fee (Q-3) should cover that. Users would see "Deposit: £60.00, refunded when the swap completes". See [the research](../../docs/research/2026-10-26-holds-and-shipping.md).
-- [ ] **Q-5:** Does each side pay their own postage (as R-9 assumes)?
-- [ ] **Q-6:** How long does the second person have to pay after acceptance (24 hours is assumed)?
-- [ ] **Q-7:** Can people list something only for swapping, with no sale price?
-- [ ] **Q-8:** Is there a limit on how many items each side can include, or on how big the cash top-up can be?
+- [ ] **Q-3:** What's the Swap Protection fee? This is brief Q-2; Buyer Protection is settled at 3% + 30p. Does Buyer Protection also apply to the cash part? **Still open:** fees are Bilal's call.
+- [ ] **Q-4:** A card hold normally lasts 7 days, and a swap runs 10 to 14. This is brief Q-4. **Proposed:** take each side's swap value as a deposit, refunded in full on completion. It works on every card and makes Bilal's failed-swap compensation certain. It costs about 1.5% + 20p of the deposit, so the Swap Protection fee (Q-3) should cover that. Users would see "Deposit: £60.00, refunded when the swap completes". See [the research](../../docs/research/2026-10-26-holds-and-shipping.md). **Still open:** a Stripe and cost call, to settle in 007's plan. Vinted has no swaps to copy.
+- [x] **Q-5:** Does each side pay their own postage? **Yes, but for the parcel coming to them, which they pick, as a buyer does.** On Vinted the buyer picks and pays for delivery, and so does our decisions table. R-9 updated.
+- [ ] **Q-6:** How long does the second person have to pay after acceptance (24 hours is assumed)? **Still open:** Vinted has no swaps, and doesn't publish a deadline for paying after an offer is accepted. A product call for Bilal.
+- [x] **Q-7:** Can people list something only for swapping, with no sale price? **No.** Every Vinted listing has a price, and a priced listing is what gives a swap item its guide value. R-2 updated.
+- [ ] **Q-8:** Is there a limit on how many items each side can include, or on how big the cash top-up can be? **Still open:** a risk call for Bilal. Vinted has no swaps to copy, and no law sets a limit.

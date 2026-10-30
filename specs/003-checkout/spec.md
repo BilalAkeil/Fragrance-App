@@ -32,17 +32,17 @@ Buyers can't buy anything yet: the Buy button says "checkout coming soon". This 
 - **AC-1.2:** When I start checkout, then I enter (or choose a saved) UK delivery address.
 - **AC-1.3:** Given my address, then I see the delivery services for this parcel with their live prices (from 004), and I pick one.
 - **AC-1.4:** Before paying, I see the item price, postage, Buyer Protection and the total, worked out by `packages/core`.
-- **AC-1.5:** When I pay by card and it succeeds, then I see an order confirmation with what happens next ("The seller has 5 working days to send it"). The listing shows as sold.
+- **AC-1.5:** When I pay by card, Apple Pay or Google Pay (Q-4) and it succeeds, then I see an order confirmation with what happens next ("The seller has 5 working days to send it"). The listing shows as sold.
 - **AC-1.6:** Given the payment fails, then nothing is bought, the listing stays available, and I'm told why in plain words.
 
 ### US-2: As a buyer, I don't want to pay for something someone else has just bought
 
-- **AC-2.1:** Given another buyer is in checkout for the same listing, then the listing is reserved for them for a short time (see Q-3). I see "Someone is checking out this item" and can't start checkout.
+- **AC-2.1:** Given another buyer is in checkout for the same listing, then the listing is reserved for them for 30 minutes (Q-3). I see "Someone is checking out this item" and can't start checkout.
 - **AC-2.2:** Given two payments succeed for the same listing anyway, then the second is refunded in full automatically, and that buyer is told.
 
 ### US-3: As a seller, I want to be paid when the order completes
 
-- **AC-3.1:** Before my listings can be bought, I set up payouts: bank details and the checks Stripe needs.
+- **AC-3.1:** Before I can list anything, I set up payouts: bank details and the checks Stripe needs. The same setup is my ID check (005, Q-2).
 - **AC-3.2:** When my order completes (004), then the item price is paid to my payouts account. I see the amount and the expected arrival date.
 - **AC-3.3:** I never pay a fee, and I'm never paid the postage. Postage pays for the label.
 
@@ -60,7 +60,7 @@ Buyers can't buy anything yet: the Buy button says "checkout coming soon". This 
 - **R-6:** When an order is created:
   - the listing becomes sold
   - every open swap proposal that includes it closes (007)
-  - a checkout reservation lasts for a short, fixed time (Q-3)
+  - a checkout reservation lasts 30 minutes (Q-3)
 - **R-7:** The money is held until the order completes, is cancelled, or a dispute is decided. The seller is paid only on completion.
 - **R-8:** Only UK delivery addresses are accepted.
 
@@ -85,7 +85,9 @@ Buyers can't buy anything yet: the Buy button says "checkout coming soon". This 
 ## Open questions
 
 - [x] **Q-1:** What's the final Buyer Protection fee? **3% of the item price + 30p** (Bilal, 2026-10-26, PR #8).
-- [ ] **Q-2:** Do sellers set up payouts before their first listing, or before their first sale? Stripe's payout setup also checks ID, so it could double as the ID check in 005. Should it?
-- [ ] **Q-3:** How long does a checkout reservation hold a listing (for example 10 minutes)?
-- [ ] **Q-4:** Do we offer Apple Pay and Google Pay at launch, or cards only?
-- [ ] **Q-5:** Is the Buyer Protection fee subject to VAT? This is a question for an accountant before launch.
+Settled on 2026-10-30 with Ben's rule: copy Vinted, and comply with UK law (law wins where they clash). Questions still open say why.
+
+- [x] **Q-2:** Payouts before the first listing or the first sale, and does it double as the ID check? **Before the first listing, and yes.** Settled in 005 Q-5 (PR #14): Vinted checks identity through its payments provider, and the decisions table puts the ID check before listing. AC-3.1 updated.
+- [x] **Q-3:** How long does a checkout reservation hold a listing? **30 minutes (31 in code).** Vinted doesn't publish a figure, and Stripe Checkout can't expire a session sooner, as built in PR #13.
+- [x] **Q-4:** Apple Pay and Google Pay at launch? **Yes.** Vinted UK offers both alongside cards ([Vinted: payment methods](https://www.vinted.co.uk/help/94)). Already on in Checkout.
+- [ ] **Q-5:** Is the Buyer Protection fee subject to VAT? **Still open:** it depends on whether we're VAT-registered (compulsory above £90,000 of taxable turnover a year) and how HMRC treats the fee. That's for an accountant before launch.

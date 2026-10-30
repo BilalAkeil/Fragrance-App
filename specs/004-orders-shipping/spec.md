@@ -29,7 +29,8 @@ Once an order is paid, both sides need to know what happens next. The seller get
 ### US-1: As a buyer, I want live delivery prices so that I can choose how it's sent
 
 - **AC-1.1:** Given my UK address and the listing, then I choose between Royal Mail Tracked 24 and Tracked 48, each with its price and a short description, such as "Tracked 48: usually 2 to 3 working days".
-- **AC-1.2:** Given the parcel breaks Royal Mail's perfume rules (for example, a bottle over 150ml), then it can't be posted, and the listing says so before anyone buys it.
+- **AC-1.2:** Given a bottle is over 150ml, then it can't be listed, and the sell form says why (Q-6). Given a parcel breaks another of Royal Mail's perfume rules, then it can't be bought, and the listing says so.
+- **AC-1.3:** The parcel size is suggested from the bottle's size and kind, and the seller can change it when listing (Q-4).
 
 ### US-2: As a seller, I want a prepaid label so that sending is easy
 
@@ -46,6 +47,7 @@ Once an order is paid, both sides need to know what happens next. The seller get
 - **AC-3.1:** When the carrier first scans the parcel, then the order moves to Shipped.
 - **AC-3.2:** When Royal Mail marks the parcel as delivered, then the order moves to Delivered and the 48-hour window starts.
 - **AC-3.3:** The order page shows a timeline with each tracking event and its time.
+- **AC-3.4:** Given tracking hasn't shown delivered 7 working days after Royal Mail's due date, then I can report "Not received" (008). I'm refunded in full, and we claim from Royal Mail (Q-5).
 
 ### US-4: As a buyer, I want to confirm or report a problem so that the seller only gets paid for what I ordered
 
@@ -92,10 +94,13 @@ Once an order is paid, both sides need to know what happens next. The seller get
 
 ## Open questions
 
-- [ ] **Q-1:** Which shipping broker? This is brief Q-6a. **Proposed:** not Packlink, which prohibits perfume. Use Sendcloud if it confirms it can carry perfume on Royal Mail, otherwise Royal Mail direct. See [the research](../../docs/research/2026-10-26-holds-and-shipping.md).
+Settled on 2026-10-30 with Ben's rule: copy Vinted, and comply with UK law (law wins where they clash). Questions still open say why.
+
+- [ ] **Q-1:** Which shipping broker? This is brief Q-6a. **Proposed:** not Packlink, which prohibits perfume. Use Sendcloud if it confirms it can carry perfume on Royal Mail, otherwise Royal Mail direct. See [the research](../../docs/research/2026-10-26-holds-and-shipping.md). **Still open:** a cost and supplier call that Vinted and the law can't answer.
 - [x] **Q-2:** Which services and bottle sizes can carry perfume? This is brief Q-7. **Royal Mail Tracked 24 and 48 only** (Ben and Bilal, 2026-10-26). Evri, InPost and DHL prohibit perfume. Royal Mail's limits are ≤150ml per item, ≤8 per parcel, retail packaging and an ID8000 label. See [the research](../../docs/research/2026-10-26-holds-and-shipping.md).
-- [ ] **Q-6:** What happens to bottles over 150ml: block them from listing, or allow collection only?
-- [ ] **Q-7:** Does a decant atomiser, or a used bottle without its box, count as "retail packaging"? We need to ask Royal Mail; the answer decides whether decants can be posted.
-- [ ] **Q-3:** Do bank holidays pause the ship-by countdown?
-- [ ] **Q-4:** How do we work out parcel size and weight for a quote? Either from the bottle size and kind, or by asking the seller to pick small or medium.
-- [ ] **Q-5:** What happens if tracking never shows delivered (a lost parcel)? Suggestion: after a set number of days, the buyer can report "not received" (008), and we claim from the carrier.
+  - **Found while settling the others (2026-10-30), for Ben and Bilal to check:** Royal Mail's current prohibited and restricted items list (May 2025) says at most **4** perfumes per parcel, and that they must be **handed in at a Post Office counter**. Its Tracked 24 and 48 pages list perfume as restricted, with Tracked 48 open to it only for senders of over 300,000 parcels a year. Confirm with Royal Mail or the broker before launch.
+- [x] **Q-6:** What happens to bottles over 150ml? **They're blocked from listing.** Vinted won't list an item too big for any of its shipping options ([Vinted: parcel size limits](https://www.vinted.co.uk/help/1227)), and has no collection-only option in the UK. AC-1.2 updated.
+- [ ] **Q-7:** Does a decant atomiser, or a used bottle without its box, count as "retail packaging"? **Still open:** only Royal Mail can answer. Its list says perfume must be "within its original retail packaging", so a decant in an atomiser probably doesn't qualify. Ask Royal Mail before launch.
+- [x] **Q-3:** Do bank holidays pause the ship-by countdown? **Yes.** Vinted's deadline is 5 business days, and UK bank holidays aren't business days (Banking and Financial Dealings Act 1971). R-1 already says so.
+- [x] **Q-4:** How do we work out parcel size and weight? **We suggest it from the bottle's size and kind, and the seller can change it when listing.** Vinted picks a parcel size from the item's details and lets the seller change it ([Vinted: choosing the right parcel size](https://www.vinted.co.uk/help/51)). Added as AC-1.3.
+- [x] **Q-5:** What happens to a lost parcel? **After 7 working days past Royal Mail's due date, the buyer can report "Not received" and is refunded in full. We claim from Royal Mail as the sender.** Vinted refunds in full once a parcel is confirmed lost ([Vinted refund policy](https://www.vinted.co.uk/help/465)). Royal Mail accepts Tracked 24/48 loss claims 7 working days after the due date, and only from the sender. Added as AC-3.4.
